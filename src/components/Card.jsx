@@ -5,7 +5,7 @@ import Button from './Button';
 function Card({ title, language, deadline, type, author, to = '', button }) {
     return (
         <CardAnt>
-            <h1>{title}</h1>
+            <h1 className="truncate">{title}</h1>
             <p>
                 Language: <span>{language}</span>
             </p>
@@ -15,7 +15,7 @@ function Card({ title, language, deadline, type, author, to = '', button }) {
             <p>
                 Type: <span>{type}</span>
             </p>
-            <p>
+            <p className="truncate">
                 Author: <span>{author}</span>
             </p>
             <Button className={'mt-2'} to={to}>
