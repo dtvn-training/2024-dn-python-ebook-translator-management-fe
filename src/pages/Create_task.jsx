@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Switch, Transfer, Button, Dropdown, Space } from 'antd';
+import { Transfer, Button, Dropdown, Space, Cascader, Input } from 'antd';
 const items = [
     {
         key: '1',
         label: (
             <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
-                1st menu item
+                Ebook 1
             </a>
         ),
     },
@@ -13,7 +13,7 @@ const items = [
         key: '2',
         label: (
             <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">
-                2nd menu item
+                Ebook 2
             </a>
         ),
     },
@@ -21,7 +21,7 @@ const items = [
         key: '3',
         label: (
             <a target="_blank" rel="noopener noreferrer" href="https://www.luohanacademy.com">
-                3rd menu item
+                Ebook 3
             </a>
         ),
     },
@@ -31,15 +31,14 @@ const mockData = Array.from({
     length: 5,
 }).map((_, i) => ({
     key: i.toString(),
-    title: `content${i + 1}`,
+    title: `Chapter ${i + 1}`,
     description: `description of content${i + 1}`,
-    disabled: i % 3 < 1,
 }));
+
 const oriTargetKeys = mockData.filter((item) => Number(item.key) % 3 > 1).map((item) => item.key);
 const Create_task = () => {
     const [targetKeys, setTargetKeys] = useState(oriTargetKeys);
     const [selectedKeys, setSelectedKeys] = useState([]);
-    const [disabled, setDisabled] = useState(false);
     const handleChange = (newTargetKeys, direction, moveKeys) => {
         setTargetKeys(newTargetKeys);
         console.log('targetKeys: ', newTargetKeys);
@@ -54,9 +53,6 @@ const Create_task = () => {
     const handleScroll = (direction, e) => {
         console.log('direction:', direction);
         console.log('target:', e.target);
-    };
-    const handleDisable = (checked) => {
-        setDisabled(checked);
     };
     return (
         <>
@@ -97,18 +93,21 @@ const Create_task = () => {
                 onSelectChange={handleSelectChange}
                 onScroll={handleScroll}
                 render={(item) => item.title}
-                disabled={disabled}
                 oneWay
                 style={{
                     marginBottom: 16,
                 }}
             />
-            <Switch
-                unCheckedChildren="disabled"
-                checkedChildren="disabled"
-                checked={disabled}
-                onChange={handleDisable}
-            />
+            <div>
+                <h4 className="mt-4 mb-4">Chapter 4</h4>
+                <Cascader className="mb-4" value={'Deadline'} />
+                <br></br>
+                Salary: <Input placeholder="Salary" className="mb-4" style={{ width: '20%' }} />
+                <br></br>
+                <Button type="primary" style={{ width: '28%' }}>
+                    Submit
+                </Button>
+            </div>
         </>
     );
 };
