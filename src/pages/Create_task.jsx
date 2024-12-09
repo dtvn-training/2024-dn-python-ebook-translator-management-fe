@@ -1,5 +1,10 @@
 import React, { useState } from 'react';
-import { Transfer, Button, Dropdown, Space, Cascader, Input } from 'antd';
+import { Transfer, Button, Dropdown, Space, Input, DatePicker } from 'antd';
+const { RangePicker } = DatePicker;
+const onOk = (value) => {
+    console.log('onOk: ', value);
+};
+
 const items = [
     {
         key: '1',
@@ -100,11 +105,23 @@ const Create_task = () => {
             />
             <div>
                 <h4 className="mt-4 mb-4">Chapter 4</h4>
-                <Cascader className="mb-4" value={'Deadline'} />
+                Deadline:
+                <RangePicker
+                    className="mb-4 ml-4"
+                    showTime={{
+                        format: 'HH:mm',
+                    }}
+                    format="YYYY-MM-DD HH:mm"
+                    onChange={(value, dateString) => {
+                        console.log('Selected Time: ', value);
+                        console.log('Formatted Selected Time: ', dateString);
+                    }}
+                    onOk={onOk}
+                />
                 <br></br>
-                Salary: <Input placeholder="Salary" className="mb-4" style={{ width: '20%' }} />
+                Salary: <Input placeholder="Salary" className="mb-4 ml-4" style={{ width: '8%' }} />
                 <br></br>
-                <Button type="primary" style={{ width: '28%' }}>
+                <Button type="primary" style={{ width: '10%' }}>
                     Submit
                 </Button>
             </div>
