@@ -2,7 +2,7 @@ import { Route, Routes } from 'react-router-dom';
 import { memberPage } from './customPage';
 import ScrollTop from '../components/ScrollTop';
 import LazyLoading from '../components/LazyLoading';
-import Layout from '../components/Layout';
+import Layout from '../components/AdminLayout';
 
 function Router() {
     return (
