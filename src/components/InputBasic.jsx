@@ -84,7 +84,6 @@ function InputBasic({ dispatch, state }) {
                     }}
                     format={'MM/DD/YYYY'}
                     value={dayjs(date.toLocaleDateString('en-GB'), 'MM/DD/YYYY')}
-                    // defaultValue={dayjs(date.toLocaleDateString('en-GB'), 'MM/DD/YYYY')}
                 />
                 <Select
                     className="!w-[150px]"

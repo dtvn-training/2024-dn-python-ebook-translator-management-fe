@@ -7,7 +7,6 @@ const arr = new Array(23).fill(null);
 
 function TaskManagement() {
     const [state, dispatch] = useReducer(inputReducer, initState);
-    console.log(state);
 
     return (
         <div className="space-y-6">
