@@ -1,11 +1,15 @@
-import { Card as CardAnt } from 'antd';
-import { Link } from 'react-router-dom';
+import { Card as CardAnt, Tooltip } from 'antd';
 import Button from './Button';
+import { memo } from 'react';
 
 function Card({ title, language, deadline, type, author, to = '', button }) {
+    const isOverDeadline = new Date().getTime() > new Date(deadline).getTime();
+
     return (
-        <CardAnt>
-            <h1 className="truncate">{title}</h1>
+        <CardAnt className={`${isOverDeadline ? 'bg-red-400' : ''}`}>
+            <Tooltip color="white" title={<p className="text-black">{title}</p>}>
+                <h1 className="truncate">{title}</h1>
+            </Tooltip>
             <p>
                 Language: <span>{language}</span>
             </p>
@@ -18,11 +22,11 @@ function Card({ title, language, deadline, type, author, to = '', button }) {
             <p className="truncate">
                 Author: <span>{author}</span>
             </p>
-            <Button className={'mt-2'} to={to}>
+            <Button white={isOverDeadline} className={`mt-2`} to={to}>
                 {button}
             </Button>
         </CardAnt>
     );
 }
 
-export default Card;
+export default memo(Card);
