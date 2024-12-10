@@ -2,8 +2,8 @@ import { Card as CardAnt, Tooltip } from 'antd';
 import Button from './Button';
 import { memo } from 'react';
 
-function Card({ title, language, deadline, type, author, to = '', button }) {
-    const isOverDeadline = new Date().getTime() > new Date(deadline).getTime();
+function Card({ title, language, deadline, type, author, to = '', button, salary, hasWarning = true }) {
+    const isOverDeadline = new Date().getTime() > new Date(deadline).getTime() && hasWarning;
 
     return (
         <CardAnt className={`${isOverDeadline ? 'bg-red-400' : ''}`}>
@@ -19,9 +19,12 @@ function Card({ title, language, deadline, type, author, to = '', button }) {
             <p>
                 Type: <span>{type}</span>
             </p>
-            <p className="truncate">
-                Author: <span>{author}</span>
-            </p>
+            {author && (
+                <p className="truncate">
+                    Author: <span>{author}</span>
+                </p>
+            )}
+            {salary && <p>Salary: {salary} VND</p>}
             <Button white={isOverDeadline} className={`mt-2`} to={to}>
                 {button}
             </Button>
