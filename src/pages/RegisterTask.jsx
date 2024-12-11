@@ -1,18 +1,35 @@
 import dayjs from 'dayjs';
-import { useReducer, useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Card from '~/components/Card';
 import InputBasic from '~/components/InputBasic';
+import { get } from '~/db';
+import { REGISTER_TASK_DETAIL } from '~/utils/constants';
+import formatDay from '~/utils/formatDay';
 import { initState, inputReducer } from '~/utils/inputReducer';
+import { taskRegister } from '~/utils/urlApi';
 
 function RegisterTask() {
     const [state, dispatch] = useReducer(inputReducer, initState);
-    const [tasks, setTasks] = useState(new Array(10).fill(null));
-
+    const [tasks, setTasks] = useState([]);
+    const navigate = useNavigate();
     const handleFindTask = async () => {
         try {
-            // Call API
+            const res = await get(taskRegister(state.title, state.type, state.language));
+            if (res.status === 200 && res.statusText == 'OK') {
+                setTasks(res.data);
+            }
         } catch (error) {}
     };
+
+    const handleRegistration = async (task) => {
+        navigate(`${REGISTER_TASK_DETAIL}/${task.task_id}`, { state: task });
+    };
+
+    // load tasks
+    useEffect(() => {
+        handleFindTask();
+    }, []);
 
     return (
         <div className="space-y-6">
@@ -24,13 +41,13 @@ function RegisterTask() {
                     <div className="space-y-1" key={index}>
                         <Card
                             hasWarning={false}
-                            title={'item.chapter_title'}
-                            deadline={dayjs(new Date()).format('MM/DD/YYYY')}
-                            language={'item.language'}
-                            type={'item.type'}
-                            salary={100000}
-                            to=""
-                            button={'Review'}
+                            title={item.chapter_title}
+                            deadline={formatDay(item.deadline)}
+                            language={item.language}
+                            type={item.type}
+                            salary={item.salary}
+                            onClick={() => handleRegistration(item)}
+                            button={'Registration'}
                         />
                     </div>
                 ))}

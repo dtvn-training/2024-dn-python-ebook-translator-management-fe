@@ -1,20 +1,27 @@
 import { DatePicker, Input, Select } from 'antd';
-import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import Button from '~/components/Button';
 import { get } from '~/db';
 import { inputKey } from '~/utils/inputReducer';
+import { getLanguage, taskCategoryUrl } from '~/utils/urlApi';
 
 function InputBasic({ dispatch, state, handleFind, isLanguage }) {
     const { title, type, language } = state;
     const [taskCategory, setTaskCategory] = useState([]);
+    const [languages, setLanguages] = useState([]);
 
     useEffect(() => {
         (async () => {
             try {
-                const res = await get('/task-category');
-                if (res.status === 200 && res.statusText === 'OK') {
-                    setTaskCategory(res.data);
+                let res = [];
+                isLanguage && res.push(get(getLanguage));
+                res.push(get(taskCategoryUrl));
+                const [resLanguages, resTaskCategories] = await Promise.all(res);
+                if (resTaskCategories.status == 200 && resTaskCategories.statusText == 'OK') {
+                    setTaskCategory(resTaskCategories.data);
+                }
+                if (resLanguages.status === 200 && resLanguages.statusText === 'OK') {
+                    setLanguages(resLanguages.data);
                 }
             } catch (error) {}
         })();
@@ -70,14 +77,10 @@ function InputBasic({ dispatch, state, handleFind, isLanguage }) {
                                 value: '',
                                 label: 'Language',
                             },
-                            {
-                                value: 1,
-                                label: 'English',
-                            },
-                            {
-                                value: 2,
-                                label: 'Laos',
-                            },
+                            ...languages.map((item) => ({
+                                value: item.language_id,
+                                label: item.title,
+                            })),
                         ]}
                     />
                 ) : (
