@@ -1,9 +1,9 @@
 import { DatePicker, Input, Select } from 'antd';
-import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import Button from '~/components/Button';
 import { get } from '~/db';
 import { inputKey } from '~/utils/inputReducer';
+import { taskCategoryUrl } from '~/utils/urlApi';
 
 function InputBasic({ dispatch, state, handleFind, isLanguage }) {
     const { title, type, language } = state;
@@ -12,7 +12,7 @@ function InputBasic({ dispatch, state, handleFind, isLanguage }) {
     useEffect(() => {
         (async () => {
             try {
-                const res = await get('/task-category');
+                const res = await get(taskCategoryUrl);
                 if (res.status === 200 && res.statusText === 'OK') {
                     setTaskCategory(res.data);
                 }

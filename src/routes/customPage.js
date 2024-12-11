@@ -1,11 +1,11 @@
 import { lazy } from 'react';
-import { pathname } from './pathname';
+import { HOME_PAGE, REVIEW_TASK, TASK_MANAGEMENT } from '~/utils/constrains';
 const TaskManagement = lazy(() => import('~/pages/TaskManagement'));
 const Home = lazy(() => import('~/pages/Home'));
 
-export const memberPage = [{ pathname: pathname.HOME_PAGE, Element: Home }];
+export const memberPage = [{ pathname: HOME_PAGE, Element: Home }];
 
 export const managerPage = [
-    { pathname: pathname.TASK_MANAGEMENT, Element: TaskManagement },
-    { pathname: pathname.REVIEW_TASK + '/:task_id', Element: null },
+    { pathname: TASK_MANAGEMENT, Element: TaskManagement },
+    { pathname: REVIEW_TASK + '/:task_id', Element: null },
 ];

@@ -3,8 +3,10 @@ import { useEffect, useReducer, useState } from 'react';
 import Card from '~/components/Card';
 import InputBasic from '~/components/InputBasic';
 import { get } from '~/db';
-import { pathname } from '~/routes/pathname';
+import { REVIEW_TASK } from '~/utils/constrains';
+import formatDay from '~/utils/formatDay';
 import { initState, inputReducer } from '~/utils/inputReducer';
+import { taskManagementUrl } from '~/utils/urlApi';
 
 function TaskManagement() {
     const [state, dispatch] = useReducer(inputReducer, initState);
@@ -12,8 +14,8 @@ function TaskManagement() {
 
     const handleFindTask = async () => {
         try {
-            const deadline = state.date ? dayjs(new Date(state.date) || new Date()).format('MM/DD/YYYY') : '';
-            const res = await get(`/task?key=${state.title}&deadline=${deadline}&task_category_id=${state.type}`);
+            const deadline = formatDay(state.date);
+            const res = await get(taskManagementUrl(state.title, deadline, state.type));
             if (res.status === 200 || res.statusText == 'OK') {
                 setTasks(res.data);
             }
@@ -35,10 +37,10 @@ function TaskManagement() {
                         <Card
                             title={item.chapter_title}
                             author={item.author}
-                            deadline={dayjs(item.deadline).format('MM/DD/YYYY')}
+                            deadline={formatDay(item.deadline)}
                             language={item.language}
                             type={item.type}
-                            to={`${pathname.REVIEW_TASK + '/123'}`}
+                            to={`${REVIEW_TASK}/${item.task_id}`}
                             button={'Review'}
                         />
                     </div>
