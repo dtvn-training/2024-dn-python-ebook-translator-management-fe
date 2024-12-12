@@ -3,11 +3,12 @@ import { managerPage, memberPage } from './customPage';
 import ScrollTop from '../components/ScrollTop';
 import LazyLoading from '../components/LazyLoading';
 import Layout from '../components/Layout';
+import { ToastContainer } from 'react-toastify';
 
 function Router() {
     return (
         <ScrollTop>
-            {/* <ToastContainer /> */}
+            <ToastContainer />
             <Routes>
                 {memberPage.map((item, index) => {
                     const Item = item.Element;

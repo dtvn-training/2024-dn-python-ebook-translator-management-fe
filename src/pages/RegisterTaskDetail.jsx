@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import Button from '~/components/Button';
 import { get, post } from '~/db';
-import { DOWLOADN_FILE } from '~/utils/constants';
+import { DOWLOADN_FILE } from '~/utils/urlApi';
 import formatDay from '~/utils/formatDay';
+import { toastError, toastSuccess } from '~/utils/toastConfig';
+import { registerTask } from '~/utils/urlApi';
 
 function RegisterTaskDetail() {
     const taskId = useParams().task_id;
@@ -17,8 +19,24 @@ function RegisterTaskDetail() {
     // xu ly dang ky task
     const handleRegisterTask = async () => {
         try {
-            // call api
-        } catch (error) {}
+            const res = await post(
+                registerTask + taskId,
+                {},
+                {
+                    headers: {
+                        Authorization: 'Bearer ' + localStorage.getItem('accessToken'),
+                    },
+                },
+            );
+            toastSuccess(res.message);
+        } catch (error) {
+            if (error.status === 400) {
+                toastError(error.response.data.message);
+            }
+            if (error.status === 401) {
+                toastError('Token expired');
+            }
+        }
     };
 
     useEffect(() => {
@@ -44,7 +62,7 @@ function RegisterTaskDetail() {
                     <p className="ml-10">{chapter.content}</p>
                 </div>
                 <p className="text-[1rem]">
-                    Download chapter:{' '}
+                    Download chapter:
                     <Link to={`${DOWLOADN_FILE}/${chapter.filename}`} className="underline italic">
                         Click_here
                     </Link>

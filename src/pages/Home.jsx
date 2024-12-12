@@ -1,4 +1,5 @@
 import { get } from '~/db';
+import { toastError } from '~/utils/toastConfig';
 import { renderToken } from '~/utils/urlApi';
 
 function Home() {
@@ -8,7 +9,9 @@ function Home() {
             if (res.status === 200 && res.statusText === 'OK') {
                 localStorage.setItem('accessToken', res.data.access_token);
             }
-        } catch (error) {}
+        } catch (error) {
+            toastError('Failed to get access token');
+        }
     };
     return (
         <h1 className="text-center">

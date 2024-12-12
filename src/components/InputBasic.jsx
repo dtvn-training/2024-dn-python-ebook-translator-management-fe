@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import Button from '~/components/Button';
 import { get } from '~/db';
 import { inputKey } from '~/utils/inputReducer';
+import { toastInfo } from '~/utils/toastConfig';
 import { getLanguage, taskCategoryUrl } from '~/utils/urlApi';
 
 function InputBasic({ dispatch, state, handleFind, isLanguage }) {
@@ -17,13 +18,20 @@ function InputBasic({ dispatch, state, handleFind, isLanguage }) {
                 isLanguage && res.push(get(getLanguage));
                 res.push(get(taskCategoryUrl));
                 const [resLanguages, resTaskCategories] = await Promise.all(res);
-                if (resTaskCategories.status == 200 && resTaskCategories.statusText == 'OK') {
-                    setTaskCategory(resTaskCategories.data);
+                if (resTaskCategories?.status == 200 && resTaskCategories?.statusText == 'OK') {
+                    setTaskCategory(resTaskCategories?.data);
                 }
+
                 if (resLanguages.status === 200 && resLanguages.statusText === 'OK') {
-                    setLanguages(resLanguages.data);
+                    if (resTaskCategories) {
+                        setLanguages(resLanguages.data);
+                    } else {
+                        setTaskCategory(resLanguages.data);
+                    }
                 }
-            } catch (error) {}
+            } catch (error) {
+                toastInfo('Failed to get information');
+            }
         })();
     }, []);
 
