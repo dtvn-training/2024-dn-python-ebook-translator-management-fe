@@ -1,5 +1,5 @@
 import { lazy } from 'react';
-import { HOME_PAGE, REVIEW_TASK, TASK_MANAGEMENT } from '~/utils/constrains';
+import { HOME_PAGE, REVIEW_TASK, TASK_MANAGEMENT } from '~/utils/constants';
 const TaskManagement = lazy(() => import('~/pages/TaskManagement'));
 const Home = lazy(() => import('~/pages/Home'));
 

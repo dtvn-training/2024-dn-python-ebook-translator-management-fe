@@ -3,7 +3,7 @@ import { useEffect, useReducer, useState } from 'react';
 import Card from '~/components/Card';
 import InputBasic from '~/components/InputBasic';
 import { get } from '~/db';
-import { REVIEW_TASK } from '~/utils/constrains';
+import { REVIEW_TASK } from '~/utils/constants';
 import formatDay from '~/utils/formatDay';
 import { initState, inputReducer } from '~/utils/inputReducer';
 import { taskManagementUrl } from '~/utils/urlApi';

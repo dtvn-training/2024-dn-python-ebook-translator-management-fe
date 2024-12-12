@@ -4,7 +4,7 @@ import { Avatar, Layout, Menu } from 'antd';
 import { FaAddressBook, FaRegBell } from 'react-icons/fa6';
 import { Link } from 'react-router-dom';
 import { Footer } from 'antd/es/layout/layout';
-import { TASK_MANAGEMENT } from '~/utils/constrains';
+import { TASK_MANAGEMENT } from '~/utils/constants';
 const { Header, Content, Sider } = Layout;
 
 const sider = [
