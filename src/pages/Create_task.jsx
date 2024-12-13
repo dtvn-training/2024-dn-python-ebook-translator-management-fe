@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Transfer, Button, Select, Space, Input, DatePicker, Alert } from 'antd';
-import { get } from '~/db';
-import warning from 'antd/es/_util/warning';
+import { get, post } from '~/db';
 
 const onOk = (value) => {
     console.log('onOk: ', value);
@@ -68,25 +67,48 @@ const Create_task = () => {
         handleFindBooks();
     }, []);
 
-    const handleTransfer = () => {
-        const currentTime = new Date();
+    const handleTransfer = async () => {
         if (!selectedBook || targetKeys.length === 0) {
             setError('Please chose least a book and a chapter');
             return;
         }
-        if (isNaN(deadline)) {
-            setError('Please input deadline!');
-            return;
-        }
-        if (deadline <= currentTime) {
-            setError('Deadline must be greater now!');
-            return;
-        }
-        if (isNaN(salary) || salary <= 0) {
-            setError('Salary not empty must be greater 0!');
+        if (!deadline || !salary) {
+            setError('Please input both Deadline and Salary!');
             return;
         }
         setError('');
+        const taskData = {
+            bookId: selectedBook,
+            chapters: targetKeys,
+            deadline,
+            salary,
+        };
+
+        try {
+            const response = await post('/tasks', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(taskData),
+            });
+
+            if (response.ok) {
+                // Handle the successful response
+                const result = await response.json();
+                console.log('Task created successfully:', result);
+                // Optionally, show a success message
+                alert('Task created successfully!');
+            } else {
+                // Handle the error from the API
+                const errorResult = await response.json();
+                console.error('Error creating task:', errorResult);
+                setError('Error creating task. Please try again.');
+            }
+        } catch (error) {
+            console.error('Network error:', error);
+            setError('Network error. Please try again.');
+        }
     };
 
     return (
@@ -113,7 +135,7 @@ const Create_task = () => {
 
             <Transfer
                 dataSource={chapters}
-                titles={['Available Chapters', 'Selected Chapters']}
+                titles={['Available', 'Selected']}
                 targetKeys={targetKeys}
                 selectedKeys={selectedKeys}
                 onChange={onChange}
@@ -123,28 +145,39 @@ const Create_task = () => {
                 className="mt-8"
             />
 
-            <div>
-                <h4 className="mt-4 mb-4">
-                    Notification: {error && <Alert message={error} type="error" showIcon className="mt-2" />}{' '}
-                </h4>
-                Deadline:
-                <Space direction="vertical" size={12} className="mb-4">
-                    <DatePicker
-                        showTime
-                        onChange={(value, dateString) => {
-                            console.log('Selected Time: ', value);
-                            console.log('Formatted Selected Time: ', dateString);
-                        }}
-                        onOk={onOk}
-                    />
-                </Space>
-                <br />
-                Salary: <Input placeholder="Salary" className="mb-4 ml-4" style={{ width: '8%' }} />
-                <br />
-                <Button type="primary" style={{ width: '10%' }} onClick={handleTransfer}>
-                    Submit
-                </Button>
+            <div className="flex space-x-10">
+                {[1, 2, 3].map((item, index) => (
+                    <div key={index}>
+                        <h4 className="mt-4 mb-4">
+                            Chapter {index + 1}
+                            {error && (
+                                <>
+                                    <Alert message={error} type="error" showIcon className="mt-2" />
+                                </>
+                            )}
+                        </h4>
+                        Deadline:{' '}
+                        <Space direction="vertical" size={12} className="mb-4">
+                            <DatePicker
+                                showTime
+                                onChange={(value, dateString) => setDeadline(dateString)}
+                                onOk={onOk}
+                            />
+                        </Space>
+                        <br />
+                        Salary:
+                        <Input
+                            placeholder="Salary"
+                            className="mb-4 ml-4"
+                            style={{ width: '78%' }}
+                            onChange={(e) => setSalary(e.target.value)}
+                        />
+                    </div>
+                ))}
             </div>
+            <Button type="primary" style={{ width: '10%' }} onClick={handleTransfer}>
+                Submit
+            </Button>
         </div>
     );
 };
