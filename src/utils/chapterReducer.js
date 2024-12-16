@@ -2,6 +2,7 @@ export const TITLE = 'title';
 export const FILE = 'file';
 export const ADDCHAPTER = 'addchaper';
 export const REMOVECHAPTER = 'removechaper';
+export const CLEAR = 'clear';
 
 export const initChapter = [
     {
@@ -24,6 +25,8 @@ export const chapterReducer = (state, action) => {
             return [...state, { ...newInitChapter }];
         case REMOVECHAPTER:
             return state.filter((_, index) => index !== payload.index);
+        case CLEAR:
+            return initChapter;
         default:
             return state;
     }
