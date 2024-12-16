@@ -1,1 +1,1 @@
-export const UPLOAD_EBOOK = '/upload-ebook'
+export const UPLOAD_EBOOK = '/upload-ebook';
