@@ -1,5 +1,13 @@
 import { lazy } from 'react';
-import { HOME_PAGE, REGISTER_TASK, REGISTER_TASK_DETAIL, REVIEW_TASK, TASK_MANAGEMENT } from '~/utils/constants';
+import {
+    HOME_PAGE,
+    REGISTER_TASK,
+    REGISTER_TASK_DETAIL,
+    REVIEW_TASK,
+    TASK_MANAGEMENT,
+    TRANSCRIPT_TASK,
+} from '~/utils/constants';
+const TranscriptTask = lazy(() => import('~/pages/TranscriptTask'));
 const RegisterTaskDetail = lazy(() => import('~/pages/RegisterTaskDetail'));
 const RegisterTask = lazy(() => import('~/pages/RegisterTask'));
 const TaskManagement = lazy(() => import('~/pages/TaskManagement'));
@@ -9,6 +17,7 @@ export const memberPage = [
     { pathname: HOME_PAGE, Element: Home },
     { pathname: REGISTER_TASK, Element: RegisterTask },
     { pathname: REGISTER_TASK_DETAIL + '/:task_id', Element: RegisterTaskDetail },
+    { pathname: TRANSCRIPT_TASK + '/:task_id', Element: TranscriptTask },
 ];
 
 export const managerPage = [
