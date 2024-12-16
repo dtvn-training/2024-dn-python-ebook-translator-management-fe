@@ -1,10 +1,10 @@
 import { Button, Input, Select, Upload } from 'antd';
 import { useEffect, useId, useReducer, useState } from 'react';
-import { get } from '~/db';
-import { getLanguage } from '~/utils/urlApi';
+import { get, post } from '~/db';
+import { getLanguage, uploadBook, uploadChapterUrl } from '~/utils/urlApi';
 import { IoCloudUploadOutline } from 'react-icons/io5';
 import ButtonCustom from '~/components/Button';
-import { ADDCHAPTER, chapterReducer, FILE, initChapter, REMOVECHAPTER, TITLE } from '~/utils/chapterReducer';
+import { ADDCHAPTER, chapterReducer, CLEAR, FILE, initChapter, REMOVECHAPTER, TITLE } from '~/utils/chapterReducer';
 import { chapterValidation, ebookValidation } from '~/validations/uploadEbook';
 
 function UploadEbook() {
@@ -50,6 +50,48 @@ function UploadEbook() {
                 );
             }
             await Promise.all(chapterValidations);
+            const resBook = await post(uploadBook, {
+                title: ebook.title,
+                language_id: ebook.languageId,
+            });
+            console.log(resBook);
+
+            if (resBook.status === 201) {
+                let uploadChapter = [];
+                for (const chapter of chapters) {
+                    const formData = new FormData();
+                    formData.append('book_id', resBook.data.data.book_id);
+                    formData.append('chapter_title', chapter.title);
+                    formData.append('file_content', chapter.file[0]);
+                    uploadChapter.push(
+                        post(uploadChapterUrl, formData, {
+                            headers: {
+                                'Content-Type': 'multipart/form-data',
+                            },
+                        }),
+                    );
+                }
+
+                const responses = await Promise.all(uploadChapter);
+                const error = [];
+                for (let i = 0; i < responses.length; i++) {
+                    const response = responses[i];
+                    if (response.status !== 201) {
+                        error.push(`Chapter ${i + 1}`);
+                    }
+                }
+                if (error.length > 0) {
+                    alert(`Error occurred while uploading chapters: ${error.join(', ')}`);
+                } else {
+                    setChapters({ key: CLEAR });
+                }
+                setEbook({
+                    title: '',
+                    languageId: '',
+                });
+                return;
+            }
+            alert('Upload ebook failed');
         } catch (error) {
             if (error.name === 'ValidationError') {
                 alert(error.message);
