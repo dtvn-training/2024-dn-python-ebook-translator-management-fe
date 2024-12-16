@@ -22,7 +22,7 @@ function UploadEbook() {
 
     const handleUploadFile = (file, index) => {
         setChapters({
-            key: FILE,
+            type: FILE,
             payload: {
                 index,
                 value: [file],
@@ -32,7 +32,7 @@ function UploadEbook() {
 
     const handleRemoveFile = (index) => {
         setChapters({
-            key: FILE,
+            type: FILE,
             payload: {
                 index,
                 value: [],
@@ -54,15 +54,16 @@ function UploadEbook() {
                 title: ebook.title,
                 language_id: ebook.languageId,
             });
-            console.log(resBook);
 
             if (resBook.status === 201) {
                 let uploadChapter = [];
-                for (const chapter of chapters) {
+                for (let i = 0; i < chapters.length; i++) {
+                    const chapter = chapters[i];
                     const formData = new FormData();
                     formData.append('book_id', resBook.data.data.book_id);
                     formData.append('chapter_title', chapter.title);
                     formData.append('file_content', chapter.file[0]);
+                    formData.append('chapter_position', i + 1);
                     uploadChapter.push(
                         post(uploadChapterUrl, formData, {
                             headers: {
@@ -83,7 +84,7 @@ function UploadEbook() {
                 if (error.length > 0) {
                     alert(`Error occurred while uploading chapters: ${error.join(', ')}`);
                 } else {
-                    setChapters({ key: CLEAR });
+                    setChapters({ type: CLEAR });
                 }
                 setEbook({
                     title: '',
@@ -153,7 +154,7 @@ function UploadEbook() {
                         <button
                             onClick={() =>
                                 setChapters({
-                                    key: REMOVECHAPTER,
+                                    type: REMOVECHAPTER,
                                     payload: {
                                         index,
                                     },
@@ -172,7 +173,7 @@ function UploadEbook() {
                                     value={item.title}
                                     onChange={(e) => {
                                         setChapters({
-                                            key: TITLE,
+                                            type: TITLE,
                                             payload: {
                                                 index,
                                                 value: e.target.value,
@@ -199,7 +200,7 @@ function UploadEbook() {
             <div className="space-x-4">
                 <ButtonCustom
                     onClick={() => {
-                        setChapters({ key: ADDCHAPTER, payload: null });
+                        setChapters({ type: ADDCHAPTER, payload: null });
                     }}
                     blue
                 >
