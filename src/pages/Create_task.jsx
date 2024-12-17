@@ -13,16 +13,14 @@ const Create_task = () => {
     const [targetKeys, setTargetKeys] = useState([]);
     const [selectedKeys, setSelectedKeys] = useState([]);
     const [error, setError] = useState('');
-    const [deadline, setDeadline] = useState(null);
-    const [salary, setSalary] = useState('');
+    const [deadline, setDeadline] = useState({});
+    const [salary, setSalary] = useState({});
 
     const onChange = (nextTargetKeys, direction, moveKeys) => {
-        console.log('targetKeys:', nextTargetKeys);
         setTargetKeys(nextTargetKeys);
     };
 
     const onSelectChange = (sourceSelectedKeys, targetSelectedKeys) => {
-        console.log('sourceSelectedKeys:', sourceSelectedKeys);
         setSelectedKeys([...sourceSelectedKeys, ...targetSelectedKeys]);
     };
 
@@ -34,12 +32,14 @@ const Create_task = () => {
     const handleFindBooks = async () => {
         try {
             const res_book = await get('/books');
-            if (res_book.status === 200 || res_book.statusText === 'OK') {
+            if (res_book.status === 200) {
                 setBooks(res_book.data);
                 if (res_book.data.length > 0) {
                     const firstBook = res_book.data[0];
                     setSelectedBook(firstBook.book_id);
                 }
+            } else {
+                console.log('Error fetching books:', res_book.status);
             }
         } catch (error) {
             console.error('Error fetching books:', error);
@@ -49,7 +49,7 @@ const Create_task = () => {
     const fetchChapters = async (bookId) => {
         try {
             const res_chapter = await get(`/chapters/${bookId}`);
-            if (res_chapter.status === 200 || res_chapter.statusText === 'OK') {
+            if (res_chapter.status === 200) {
                 const chapterData = res_chapter.data.map((chapter) => ({
                     key: chapter.chapter_id.toString(),
                     title: chapter.chapter_title,
@@ -57,6 +57,8 @@ const Create_task = () => {
                 setChapters(chapterData);
                 setTargetKeys([]);
                 setSelectedKeys([]);
+            } else {
+                console.log('Error fetching chapters:', res_chapter.status);
             }
         } catch (error) {
             console.error('Error fetching chapters:', error);
@@ -68,46 +70,46 @@ const Create_task = () => {
     }, []);
 
     const handleTransfer = async () => {
-        if (!selectedBook || targetKeys.length === 0) {
-            setError('Please chose least a book and a chapter');
+        if (!selectedBook) {
+            setError('Please choose a book.');
             return;
         }
-        if (!deadline || !salary) {
-            setError('Please input both Deadline and Salary!');
+        if (targetKeys.length === 0) {
+            setError('Please select at least one chapter.');
             return;
+        }
+        for (let chapterKey of targetKeys) {
+            if (!deadline[chapterKey]) {
+                setError(
+                    `Please input Deadline for chapter "${chapters.find((chap) => chap.key === chapterKey)?.title}"`,
+                );
+                return;
+            }
+            if (!salary[chapterKey]) {
+                setError(
+                    `Please input Salary for chapter "${chapters.find((chap) => chap.key === chapterKey)?.title}"`,
+                );
+                return;
+            }
         }
         setError('');
         const taskData = {
-            bookId: selectedBook,
             chapters: targetKeys,
             deadline,
             salary,
         };
 
         try {
-            const response = await post('/tasks', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(taskData),
-            });
-
-            if (response.ok) {
-                // Handle the successful response
-                const result = await response.json();
-                console.log('Task created successfully:', result);
-                // Optionally, show a success message
-                alert('Task created successfully!');
-            } else {
-                // Handle the error from the API
-                const errorResult = await response.json();
-                console.error('Error creating task:', errorResult);
-                setError('Error creating task. Please try again.');
+            debugger;
+            const response = await post('/tasks', taskData);
+            if (!response || response.status !== 200) {
+                setError('There was an issue creating the task. Please try again later.');
+                return;
             }
+            console.log('Task created successfully:', response.data);
+            alert('Task created successfully!');
         } catch (error) {
-            console.error('Network error:', error);
-            setError('Network error. Please try again.');
+            setError('Create Task Fail!');
         }
     };
 
@@ -145,35 +147,54 @@ const Create_task = () => {
                 className="mt-8"
             />
 
-            <div className="flex space-x-10">
-                {[1, 2, 3].map((item, index) => (
-                    <div key={index}>
-                        <h4 className="mt-4 mb-4">
-                            Chapter {index + 1}
-                            {error && (
-                                <>
-                                    <Alert message={error} type="error" showIcon className="mt-2" />
-                                </>
-                            )}
-                        </h4>
-                        Deadline:{' '}
-                        <Space direction="vertical" size={12} className="mb-4">
-                            <DatePicker
-                                showTime
-                                onChange={(value, dateString) => setDeadline(dateString)}
-                                onOk={onOk}
+            {/* Nhắc nhở khi chưa chọn chapter */}
+            {targetKeys.length === 0 && (
+                <Alert
+                    message="Please choose least 1 chapter to create task"
+                    type="warning"
+                    showIcon
+                    className="mt-4"
+                />
+            )}
+
+            <div className="flex space-x-10 mt-8">
+                {targetKeys.map((chapterKey, index) => {
+                    const chapter = chapters.find((chap) => chap.key === chapterKey);
+                    return (
+                        <div key={index}>
+                            <h4 className="mt-4 mb-4">
+                                {chapter.title}
+                                {error && <Alert message={error} type="error" showIcon className="mt-2" />}
+                            </h4>
+                            Deadline:{' '}
+                            <Space direction="vertical" size={12} className="mb-4">
+                                <DatePicker
+                                    showTime
+                                    onChange={(value, dateString) => {
+                                        setDeadline((prevDeadline) => ({
+                                            ...prevDeadline,
+                                            [chapterKey]: dateString,
+                                        }));
+                                    }}
+                                    onOk={onOk}
+                                />
+                            </Space>
+                            <br />
+                            Salary:
+                            <Input
+                                placeholder="Salary"
+                                className="mb-4 ml-4"
+                                style={{ width: '78%' }}
+                                onChange={(e) => {
+                                    setSalary((prevSalary) => ({
+                                        ...prevSalary,
+                                        [chapterKey]: e.target.value,
+                                    }));
+                                }}
                             />
-                        </Space>
-                        <br />
-                        Salary:
-                        <Input
-                            placeholder="Salary"
-                            className="mb-4 ml-4"
-                            style={{ width: '78%' }}
-                            onChange={(e) => setSalary(e.target.value)}
-                        />
-                    </div>
-                ))}
+                        </div>
+                    );
+                })}
             </div>
             <Button type="primary" style={{ width: '10%' }} onClick={handleTransfer}>
                 Submit

@@ -3,6 +3,7 @@ const config = axios.create({
     baseURL: 'http://localhost:5000/api',
     headers: {
         'Content-Type': 'application/json',
+        // 'Access-Control-Allow-Origin': '*',
     },
     timeout: 10000,
 });
@@ -16,10 +17,10 @@ export const get = async (url, options) => {
     }
 };
 
-export const post = async (url, data, options) => {
+export const post = async (url, data) => {
     try {
-        const response = await config.post(url, data, options);
-        return response.data;
+        const response = await config.post(url, data);
+        return response;
     } catch (error) {
         throw error;
     }
