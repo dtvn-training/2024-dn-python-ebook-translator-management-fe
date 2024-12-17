@@ -6,10 +6,12 @@ import {
     REVIEW_TASK,
     TASK_MANAGEMENT,
     TRANSCRIPT_TASK,
+    UPLOAD_EBOOK,
 } from '~/utils/constants';
 const TranscriptTask = lazy(() => import('~/pages/TranscriptTask'));
 const RegisterTaskDetail = lazy(() => import('~/pages/RegisterTaskDetail'));
 const RegisterTask = lazy(() => import('~/pages/RegisterTask'));
+const UploadEbook = lazy(() => import('~/pages/UploadEbook'));
 const TaskManagement = lazy(() => import('~/pages/TaskManagement'));
 const Home = lazy(() => import('~/pages/Home'));
 
@@ -24,3 +26,5 @@ export const managerPage = [
     { pathname: TASK_MANAGEMENT, Element: TaskManagement },
     { pathname: REVIEW_TASK + '/:task_id', Element: null },
 ];
+
+export const adminPage = [{ pathname: UPLOAD_EBOOK, Element: UploadEbook }];

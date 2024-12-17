@@ -9,3 +9,5 @@ export const getLanguage = '/language';
 export const renderToken = '/user/auto-authen';
 export const registerTask = '/task/register-task/';
 export const DOWLOADN_FILE = 'http://localhost:5000/api/files';
+export const uploadBook = '/ebook/upload';
+export const uploadChapterUrl = '/chapter/upload';
