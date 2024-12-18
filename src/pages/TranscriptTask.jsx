@@ -1,48 +1,125 @@
 import { Button, Upload } from 'antd';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { IoCloudUploadOutline } from 'react-icons/io5';
 import ViewComment from '~/components/ViewComment';
 import ButtonCustom from '~/components/Button';
+import { useParams } from 'react-router-dom';
+import { get, post } from '~/db';
+import { getContent, getTaskInformation, uploadContent } from '~/utils/urlApi';
+import { toastInfo, toastSuccess } from '~/utils/toastConfig';
+import formatDay from '~/utils/formatDay';
+import { uploadContentValidation } from '~/validations/uploadEbook';
 
 function TranscriptTask() {
+    const { task_id } = useParams();
     const [translationFile, setTranslationFile] = useState([]);
+    const [taskInformation, setTaskInformation] = useState({
+        chapter_title: '',
+        deadline: '',
+        language: '',
+        task_id: '',
+        type: '',
+        content: '',
+    });
+    const [content, setContent] = useState('');
+    useEffect(() => {
+        (async () => {
+            try {
+                const [resTask, resContent] = await Promise.all([
+                    get(`${getTaskInformation}/${task_id}`),
+                    get(`${getContent}/${task_id}`),
+                ]);
+                if (resContent.status === 200) {
+                    setContent(resContent.data.data.content);
+                }
+                if (resTask.status === 200) {
+                    setTaskInformation(resTask.data.data);
+                }
+            } catch (error) {
+                toastInfo('Dont find task information');
+            }
+        })();
+    }, [task_id]);
+
+    const handleSaveTrans = async () => {
+        try {
+            const isAllow = uploadContentValidation(task_id, translationFile, content);
+            if (!isAllow) return;
+            let formData = new FormData();
+            if (translationFile.length > 0) {
+                formData.append('task_id', task_id);
+                formData.append('file_content', translationFile[0]);
+            } else {
+                formData.append('task_id', task_id);
+                formData.append('content', content);
+            }
+            const res = await post(uploadContent, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    Authorization: 'Bearer ' + localStorage.getItem('accessToken'),
+                },
+            });
+            if (res.status === 201) {
+                setContent(res.data.data.content);
+                toastSuccess('Successfully uploaded');
+                setTranslationFile([]);
+            }
+        } catch (error) {
+            toastInfo('Failed to save translation');
+        }
+    };
+
+    const handleCompletedTrans = async () => {
+        try {
+            const is_allow = uploadContentValidation(task_id, translationFile, content);
+            if (!is_allow) return;
+            let formData = new FormData();
+            if (translationFile.length > 0) {
+                formData.append('task_id', task_id);
+                formData.append('file_content', translationFile[0]);
+            } else {
+                formData.append('task_id', task_id);
+                formData.append('content', content);
+            }
+            formData.append('status', true);
+            const res = await post(uploadContent, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    Authorization: 'Bearer ' + localStorage.getItem('accessToken'),
+                },
+            });
+            if (res.status === 201) {
+                setContent(res.data.data.content);
+                toastSuccess('Successfully completed translation');
+                setTranslationFile([]);
+            }
+        } catch (error) {
+            toastInfo('Failed to upload content');
+        }
+    };
+
     return (
         <div className="space-y-2">
-            <p>Chapter's name: Pokemon</p>
-            <p>Language: English</p>
-            <p>Type: Translate</p>
-            <p>Deadline: 01/01/2025</p>
+            <p>Chapter's name: {taskInformation.chapter_title}</p>
+            <p>Language: {taskInformation.language}</p>
+            <p>Type: {taskInformation.type}</p>
+            <p>Deadline: {formatDay(taskInformation.deadline)}</p>
             <div className="flex h-[550px]">
                 <div className="overflow-hidden flex-1 space-y-2 justify-between items-center m-3">
                     <h2 className="text-[20px]">Content</h2>
-                    <p className="h-[500px] overflow-y-auto">
-                        One day, Nobita, a clumsy and unlucky boy, meets Doraemon, a robotic cat from the 22nd century
-                        sent by Nobita’s descendants to help him improve his future. Doraemon uses futuristic gadgets
-                        like the Bamboo Copter and Anywhere Door to assist Nobita in his daily struggles, from failing
-                        in school to being bullied by Gian and manipulated by Suneo. Despite having access to incredible
-                        gadgets, Nobita’s misuse often leads to hilarious and chaotic situations. Together with his
-                        friends—Shizuka, Gian, and Suneo—they go on extraordinary adventures, such as time traveling to
-                        prehistoric eras, exploring alien worlds, or solving mysteries. Through their journeys, Nobita
-                        learns important lessons about responsibility, courage, and the value of friendship. The story
-                        blends humor, heartwarming moments, and thrilling adventures, captivating readers with its
-                        imaginative and relatable tales. One day, Nobita, a clumsy and unlucky boy, meets Doraemon, a
-                        robotic cat from the 22nd century sent by Nobita’s descendants to help him improve his future.
-                        Doraemon uses futuristic gadgets like the Bamboo Copter and Anywhere Door to assist Nobita in
-                        his daily struggles, from failing in school to being bullied by Gian and manipulated by Suneo.
-                        Despite having access to incredible gadgets, Nobita’s misuse often leads to hilarious and
-                        chaotic situations. Together with his friends—Shizuka, Gian, and Suneo—they go on extraordinary
-                        adventures, such as time traveling to prehistoric eras, exploring alien worlds, or solving
-                        mysteries. his daily struggles, from failing in school to being bullied by Gian and manipulated
-                        by Suneo. Despite having access to incredible gadgets, Nobita’s misuse often leads to hilarious
-                        and chaotic situations. Together with his friends—Shizuka, Gian, and Suneo—they go on
-                        extraordinary adventures, such as time traveling to prehistoric eras, exploring alien worlds, or
-                        solving mysteries.
-                    </p>
+                    <p className="h-[500px] overflow-y-auto">{taskInformation.content}</p>
                 </div>
                 <hr class="bg-gray-300 w-[1px] h-[80%] m-auto"></hr>
                 <div className=" flex-1 space-y-2 m-3">
                     <h2 className="text-[20px]">Translate</h2>
-                    <textarea placeholder="Add your transcript " className="w-full h-[500px] resize-none"></textarea>
+                    <textarea
+                        placeholder="Add your transcript"
+                        value={content}
+                        onChange={(e) => {
+                            setContent(e.target.value);
+                        }}
+                        className="w-full h-[500px] resize-none"
+                    ></textarea>
                 </div>
             </div>
             <div className="flex items-start space-x-3 h-[70px]">
@@ -52,7 +129,6 @@ function TranscriptTask() {
                         setTranslationFile([]);
                     }}
                     beforeUpload={(e) => {
-                        console.log(e);
                         setTranslationFile([e]);
                         return false;
                     }}
@@ -79,8 +155,12 @@ function TranscriptTask() {
                 </div>
             </div>
             <div className="pt-5 space-x-4">
-                <ButtonCustom blue>Save</ButtonCustom>
-                <ButtonCustom green>Completed</ButtonCustom>
+                <ButtonCustom onClick={handleSaveTrans} blue>
+                    Save
+                </ButtonCustom>
+                <ButtonCustom onClick={handleCompletedTrans} green>
+                    Completed
+                </ButtonCustom>
             </div>
         </div>
     );

@@ -11,3 +11,6 @@ export const registerTask = '/task/register-task/';
 export const DOWLOADN_FILE = 'http://localhost:5000/api/files';
 export const uploadBook = '/ebook/upload';
 export const uploadChapterUrl = '/chapter/upload';
+export const getTaskInformation = '/task/information';
+export const getContent = '/content';
+export const uploadContent = '/content/upload';
