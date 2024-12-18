@@ -3,14 +3,14 @@ const config = axios.create({
     baseURL: 'http://localhost:5000/api',
     headers: {
         'Content-Type': 'application/json',
-        // 'Access-Control-Allow-Origin': '*',
+        // methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     },
     timeout: 10000,
 });
 
 export const get = async (url, options) => {
     try {
-        const response = await config.get(url, options);
+        const response = await config.get(url);
         return response;
     } catch (error) {
         throw error;
@@ -18,9 +18,10 @@ export const get = async (url, options) => {
 };
 
 export const post = async (url, data, options) => {
+export const post = async (url, data, options) => {
     try {
         const response = await config.post(url, data, options);
-        return response.data;
+        return response;
     } catch (error) {
         throw error;
     }
