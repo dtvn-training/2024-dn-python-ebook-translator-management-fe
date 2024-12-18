@@ -15,6 +15,8 @@ const Create_task = () => {
     const [error, setError] = useState('');
     const [deadline, setDeadline] = useState({});
     const [salary, setSalary] = useState({});
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertType, setAlertType] = useState('');
 
     const onChange = (nextTargetKeys, direction, moveKeys) => {
         setTargetKeys(nextTargetKeys);
@@ -57,12 +59,23 @@ const Create_task = () => {
                 setChapters(chapterData);
                 setTargetKeys([]);
                 setSelectedKeys([]);
+                setDeadline({});
+                setSalary({});
             } else {
                 console.log('Error fetching chapters:', res_chapter.status);
             }
         } catch (error) {
             console.error('Error fetching chapters:', error);
         }
+    };
+
+    const showAlert = (message, type) => {
+        setAlertMessage(message);
+        setAlertType(type);
+        setTimeout(() => {
+            setAlertMessage('');
+            setAlertType('');
+        }, 3000);
     };
 
     useEffect(() => {
@@ -78,38 +91,46 @@ const Create_task = () => {
             setError('Please select at least one chapter.');
             return;
         }
-        for (let chapterKey of targetKeys) {
-            if (!deadline[chapterKey]) {
-                setError(
-                    `Please input Deadline for chapter "${chapters.find((chap) => chap.key === chapterKey)?.title}"`,
-                );
+
+        const currentDate = new Date();
+        for (const chapterKey of targetKeys) {
+            if (new Date(deadline[chapterKey]) <= currentDate) {
+                setError('The deadline must be a future date.');
                 return;
             }
-            if (!salary[chapterKey]) {
-                setError(
-                    `Please input Salary for chapter "${chapters.find((chap) => chap.key === chapterKey)?.title}"`,
-                );
+
+            if (!salary[chapterKey] || salary[chapterKey] < 0) {
+                setError('Salary must be greater than 0.');
                 return;
             }
         }
-        setError('');
-        const taskData = {
-            chapters: targetKeys,
-            deadline,
-            salary,
-        };
+
+        const taskDataList = targetKeys.map((chapterKey) => ({
+            chapter_id: chapterKey,
+            deadline: deadline[chapterKey],
+            salary: salary[chapterKey],
+        }));
 
         try {
-            debugger;
-            const response = await post('/tasks', taskData);
-            if (!response || response.status !== 200) {
-                setError('There was an issue creating the task. Please try again later.');
+            const response = await post('/tasks/create/', taskDataList);
+            if (!response || response.status !== 201) {
+                setError('There was an issue creating the tasks. Please try again later.');
                 return;
             }
-            console.log('Task created successfully:', response.data);
-            alert('Task created successfully!');
+
+            console.log('Tasks created successfully:', response.data);
+            showAlert('Tasks created successfully!', 'success');
+
+            setChapters([]);
+            setSelectedBook(null);
+            setTargetKeys([]);
+            setSelectedKeys([]);
+            setDeadline({});
+            setSalary({});
         } catch (error) {
-            setError('Create Task Fail!');
+            console.error('Error creating tasks:', error);
+            setError('Create Tasks Fail!');
+            showAlert('There was an error creating the tasks.', 'error');
         }
     };
 
@@ -146,11 +167,10 @@ const Create_task = () => {
                 render={(item) => item.title}
                 className="mt-8"
             />
-
-            {/* Nhắc nhở khi chưa chọn chapter */}
+            {alertMessage && <Alert message={alertMessage} type={alertType} showIcon className="mt-4" />}
             {targetKeys.length === 0 && (
                 <Alert
-                    message="Please choose least 1 chapter to create task"
+                    message="Please choose at least 1 chapter to create task"
                     type="warning"
                     showIcon
                     className="mt-4"
