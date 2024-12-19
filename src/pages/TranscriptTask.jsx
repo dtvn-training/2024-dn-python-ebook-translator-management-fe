@@ -39,7 +39,7 @@ function TranscriptTask() {
                     setTaskInformation(resTask.data.data);
                 }
                 if (resComment.status === 200) {
-                    setComments(resComment.data.data);
+                    setComments(resComment.data?.data || []);
                 }
             } catch (error) {
                 toastInfo('Dont find task information');
