@@ -18,7 +18,6 @@ export const get = async (url, options) => {
 };
 
 export const post = async (url, data, options) => {
-export const post = async (url, data, options) => {
     try {
         const response = await config.post(url, data, options);
         return response;
