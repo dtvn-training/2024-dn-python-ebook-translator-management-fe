@@ -4,6 +4,7 @@ import ScrollTop from '../components/ScrollTop';
 import LazyLoading from '../components/LazyLoading';
 import Layout from '../components/Layout';
 import { ToastContainer } from 'react-toastify';
+import Implementing from '~/pages/Implementing';
 
 function Router() {
     return (
@@ -88,6 +89,14 @@ function Router() {
                         ></Route>
                     );
                 })}
+                <Route
+                    path="*"
+                    element={
+                        <Layout>
+                            <Implementing />
+                        </Layout>
+                    }
+                />
             </Routes>
         </ScrollTop>
     );

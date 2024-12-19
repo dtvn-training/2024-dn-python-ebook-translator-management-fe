@@ -1,20 +1,42 @@
 import React from 'react';
 import { ContainerOutlined, LineChartOutlined, SolutionOutlined } from '@ant-design/icons';
-import { Avatar, Layout, Menu } from 'antd';
+import { AiOutlineHome } from 'react-icons/ai';
+import { Avatar, Layout, Menu, Popover } from 'antd';
 import { FaAddressBook, FaRegBell } from 'react-icons/fa6';
 import { Link } from 'react-router-dom';
 import { Footer } from 'antd/es/layout/layout';
-import { TASK_MANAGEMENT } from '~/utils/constants';
+import {
+    ALL_TASK,
+    HOME_PAGE,
+    MY_TASK,
+    REGISTER_TASK,
+    TASK_MANAGEMENT,
+    TRANSLATE_PROCESS,
+    UPLOAD_EBOOK,
+} from '~/utils/constants';
 const { Header, Content, Sider } = Layout;
 
 const sider = [
     {
         key: 1,
-        label: <Link className="text-base">All Tasks</Link>,
-        icon: <SolutionOutlined style={{ fontSize: '20px' }} />,
+        label: (
+            <Link to={HOME_PAGE} className="text-base">
+                Home
+            </Link>
+        ),
+        icon: <AiOutlineHome style={{ fontSize: '20px' }} />,
     },
     {
         key: 2,
+        label: (
+            <Link to={REGISTER_TASK} className="text-base">
+                All Tasks
+            </Link>
+        ),
+        icon: <SolutionOutlined style={{ fontSize: '20px' }} />,
+    },
+    {
+        key: 3,
         label: (
             <Link to={TASK_MANAGEMENT} className="text-base">
                 Task management
@@ -23,8 +45,12 @@ const sider = [
         icon: <ContainerOutlined style={{ fontSize: '20px' }} />,
     },
     {
-        key: 3,
-        label: <Link className="text-base">Translation progress</Link>,
+        key: 4,
+        label: (
+            <Link to={TRANSLATE_PROCESS} className="text-base">
+                Translation progress
+            </Link>
+        ),
         icon: <LineChartOutlined style={{ fontSize: '20px' }} />,
     },
 ];
@@ -39,15 +65,20 @@ const LayoutComponet = ({ children }) => {
                 className="bg-white"
             >
                 <div className="flex justify-between w-full items-center">
-                    <h1 className="text-lg font-medium">Translation System</h1>
+                    <Link to={'/'} className="text-lg font-medium">
+                        Translation System
+                    </Link>
                     <div className="flex items-center space-x-4">
                         <button className="text-2xl">
                             <FaRegBell />
                         </button>
-                        <button className="text-2xl">
+                        <Link to={MY_TASK} className="text-2xl">
                             <FaAddressBook />
-                        </button>
-                        <Avatar size={30}>User</Avatar>
+                        </Link>
+
+                        <Popover placement="bottomLeft" content={<Link to={UPLOAD_EBOOK}>Upload Ebook</Link>}>
+                            <Avatar size={30}>User</Avatar>
+                        </Popover>
                     </div>
                 </div>
             </Header>
