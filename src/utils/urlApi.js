@@ -14,3 +14,5 @@ export const uploadChapterUrl = '/chapter/upload';
 export const getTaskInformation = '/task/information';
 export const getContent = '/content';
 export const uploadContent = '/content/upload';
+export const getComment = '/comment';
+export const confirmComment = '/comment/confirm-comment';

@@ -5,15 +5,16 @@ import ViewComment from '~/components/ViewComment';
 import ButtonCustom from '~/components/Button';
 import { useParams } from 'react-router-dom';
 import { get, post } from '~/db';
-import { getContent, getTaskInformation, uploadContent } from '~/utils/urlApi';
-import { toastInfo, toastSuccess } from '~/utils/toastConfig';
+import { confirmComment, getComment, getContent, getTaskInformation, uploadContent } from '~/utils/urlApi';
+import { toastError, toastInfo, toastSuccess } from '~/utils/toastConfig';
 import formatDay from '~/utils/formatDay';
 import { uploadContentValidation } from '~/validations/uploadEbook';
-import { optionFormAndAuth } from '~/utils/optionFormData';
+import { optionAuth, optionFormAndAuth } from '~/utils/optionFormData';
 
 function TranscriptTask() {
     const { task_id } = useParams();
     const [translationFile, setTranslationFile] = useState([]);
+    const [comments, setComments] = useState([]);
     const [taskInformation, setTaskInformation] = useState({
         chapter_title: '',
         deadline: '',
@@ -26,15 +27,19 @@ function TranscriptTask() {
     useEffect(() => {
         (async () => {
             try {
-                const [resTask, resContent] = await Promise.all([
+                const [resTask, resContent, resComment] = await Promise.all([
                     get(`${getTaskInformation}/${task_id}`),
                     get(`${getContent}/${task_id}`),
+                    get(`${getComment}/${task_id}`),
                 ]);
                 if (resContent.status === 200) {
                     setContent(resContent.data.data.content);
                 }
                 if (resTask.status === 200) {
                     setTaskInformation(resTask.data.data);
+                }
+                if (resComment.status === 200) {
+                    setComments(resComment.data.data);
                 }
             } catch (error) {
                 toastInfo('Dont find task information');
@@ -67,6 +72,28 @@ function TranscriptTask() {
             }
         } catch (error) {
             toastInfo('Failed to save translation');
+        }
+    };
+
+    const handleConfirmComment = async (commentId) => {
+        try {
+            const res = await post(
+                confirmComment,
+                {
+                    comment_id: commentId,
+                },
+                optionAuth,
+            );
+            if (res.status === 200) {
+                setComments(
+                    comments.map((comment) =>
+                        comment.comment_id === commentId ? { ...comment, status: true } : comment,
+                    ),
+                );
+                toastSuccess('Successfully confirmed comment');
+            }
+        } catch (error) {
+            toastError('Failed to confirm comment');
         }
     };
 
@@ -136,18 +163,14 @@ function TranscriptTask() {
             <div className="space-y-4 xl:w-1/2">
                 <h2 className="text-xl">Comment</h2>
                 <div className="pl-2 space-y-4">
-                    <ViewComment
-                        author={'Nguyen Thanh An - manager'}
-                        content={
-                            'Can co mot vai chinh sua Can co mot vai chinh sua Can co mot vai chinh sua Can co mot vai chinh sua Can co mot vai chinh sua Can co mot vai chinh sua Can co mot vai chinh sua'
-                        }
-                        isComfirm={true}
-                    />
-                    <ViewComment
-                        author={'Nguyen Thanh An - manager'}
-                        content={'Can co mot vai chinh sua'}
-                        isComfirm={false}
-                    />
+                    {comments.map((item, i) => (
+                        <ViewComment
+                            author={`${item.fullname} - ${item.role}`}
+                            content={item.content}
+                            isComfirm={item.status}
+                            onClick={() => handleConfirmComment(item.comment_id)}
+                        />
+                    ))}
                 </div>
             </div>
             <div className="pt-5 space-x-4">

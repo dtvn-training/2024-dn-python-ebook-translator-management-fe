@@ -2,7 +2,7 @@ import { Avatar, Tooltip } from 'antd';
 import { CiCircleCheck } from 'react-icons/ci';
 import Button from './Button';
 
-function ViewComment({ author, content, isComfirm = false }) {
+function ViewComment({ author, content, isComfirm = false, onClick }) {
     return (
         <div className="flex items-center justify-between">
             <div className="flex space-x-3 ">
@@ -17,7 +17,13 @@ function ViewComment({ author, content, isComfirm = false }) {
                 </div>
             </div>
             <div className="min-w-[20px]">
-                {isComfirm ? <CiCircleCheck className="text-3xl text-green-500" /> : <Button green>Confirm</Button>}
+                {isComfirm ? (
+                    <CiCircleCheck className="text-3xl text-green-500" />
+                ) : (
+                    <Button onClick={onClick} green>
+                        Confirm
+                    </Button>
+                )}
             </div>
         </div>
     );
