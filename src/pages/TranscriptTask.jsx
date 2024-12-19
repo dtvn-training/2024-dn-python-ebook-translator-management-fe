@@ -9,6 +9,7 @@ import { getContent, getTaskInformation, uploadContent } from '~/utils/urlApi';
 import { toastInfo, toastSuccess } from '~/utils/toastConfig';
 import formatDay from '~/utils/formatDay';
 import { uploadContentValidation } from '~/validations/uploadEbook';
+import { optionFormAndAuth } from '~/utils/optionFormData';
 
 function TranscriptTask() {
     const { task_id } = useParams();
@@ -82,12 +83,7 @@ function TranscriptTask() {
                 formData.append('content', content);
             }
             formData.append('status', true);
-            const res = await post(uploadContent, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    Authorization: 'Bearer ' + localStorage.getItem('accessToken'),
-                },
-            });
+            const res = await post(uploadContent, formData, optionFormAndAuth);
             if (res.status === 201) {
                 setContent(res.data.data.content);
                 toastSuccess('Successfully completed translation');

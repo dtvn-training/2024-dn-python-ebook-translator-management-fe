@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import Button from '~/components/Button';
 import { get, post } from '~/db';
-import { DOWLOADN_FILE } from '~/utils/urlApi';
+import { DOWNLOAD_FILE } from '~/utils/urlApi';
 import formatDay from '~/utils/formatDay';
 import { toastError, toastSuccess } from '~/utils/toastConfig';
 import { registerTask } from '~/utils/urlApi';
+import { optionAuth } from '~/utils/optionFormData';
 
 function RegisterTaskDetail() {
     const taskId = useParams().task_id;
@@ -20,15 +21,13 @@ function RegisterTaskDetail() {
     const handleRegisterTask = async () => {
         try {
             const res = await post(
-                registerTask + taskId,
-                {},
+                registerTask,
                 {
-                    headers: {
-                        Authorization: 'Bearer ' + localStorage.getItem('accessToken'),
-                    },
+                    task_id: taskId,
                 },
+                optionAuth,
             );
-            toastSuccess(res.message);
+            if (res.status === 201) toastSuccess('Successfully registered');
         } catch (error) {
             if (error.status === 400) {
                 toastError(error.response.data.message);
@@ -63,7 +62,7 @@ function RegisterTaskDetail() {
                 </div>
                 <p className="text-[1rem]">
                     Download chapter:
-                    <Link to={`${DOWLOADN_FILE}/${chapter.filename}`} className="underline italic">
+                    <Link to={`${DOWNLOAD_FILE}/${chapter.filename}`} className="underline italic">
                         Click_here
                     </Link>
                 </p>
