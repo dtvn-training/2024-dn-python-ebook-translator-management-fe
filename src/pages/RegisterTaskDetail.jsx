@@ -7,6 +7,7 @@ import formatDay from '~/utils/formatDay';
 import { toastError, toastSuccess } from '~/utils/toastConfig';
 import { registerTask } from '~/utils/urlApi';
 import { optionAuth } from '~/utils/optionFormData';
+import { formatMoney } from '~/utils/formatMoney';
 
 function RegisterTaskDetail() {
     const taskId = useParams().task_id;
@@ -55,7 +56,6 @@ function RegisterTaskDetail() {
                 <p className="text-[1rem]">Language: {task.language}</p>
                 <p className="text-[1rem]">Type: {task.type}</p>
                 <p className="text-[1rem]">Deadline: {formatDay(task.deadline)}</p>
-                <p className="text-[1rem]">Salary: {task.salary} VND</p>
                 <div>
                     <h4 className="text-[1rem]">Short content:</h4>
                     <p className="ml-10">{chapter.content}</p>

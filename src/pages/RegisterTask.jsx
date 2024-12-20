@@ -10,6 +10,7 @@ import { initState, inputReducer } from '~/utils/inputReducer';
 import { toastError, toastInfo } from '~/utils/toastConfig';
 import { taskRegister } from '~/utils/urlApi';
 import { isCallApi, limit } from '~/utils/paginate';
+import { formatMoney } from '~/utils/formatMoney';
 
 function RegisterTask() {
     const [state, dispatch] = useReducer(inputReducer, initState);
@@ -18,14 +19,15 @@ function RegisterTask() {
     const containerRef = useRef(null);
     const [hasMore, setHasMore] = useState(true);
     const navigate = useNavigate();
-    const handleFindTask = async () => {
+    const handleFindTask = async (isNextPage = false) => {
         try {
             const res = await get(taskRegister(state.title, state.type, state.language, currentPage, limit));
             if (res.status === 200 && res.statusText == 'OK' && res.data) {
                 if (res.data.length < limit) {
                     setHasMore(false);
                 }
-                setTasks((pre) => [...pre, ...res.data]);
+                if (isNextPage) setTasks((pre) => [...pre, ...res.data]);
+                else setTasks(res.data);
             }
         } catch (error) {
             toastError('Failed to find task');
@@ -50,7 +52,7 @@ function RegisterTask() {
 
     // load tasks
     useEffect(() => {
-        handleFindTask();
+        handleFindTask(true);
     }, [currentPage]);
 
     return (
