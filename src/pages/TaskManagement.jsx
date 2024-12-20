@@ -17,7 +17,7 @@ function TaskManagement() {
     const containerRef = useRef(null);
     const [hasMore, setHasMore] = useState(true);
 
-    const handleFindTask = async () => {
+    const handleFindTask = async (isNextPage) => {
         try {
             const deadline = formatDay(state.date);
             const res = await get(taskManagementUrl(state.title, deadline, state.type, currentPage, limit));
@@ -26,7 +26,8 @@ function TaskManagement() {
                 if (res.data.data.length < limit) {
                     setHasMore(false);
                 }
-                setTasks([...tasks, ...res.data.data]);
+                if (isNextPage) setTasks([...tasks, ...res.data.data]);
+                else setTasks(res.data.data);
             }
         } catch (error) {
             toastError('Failed to find task');
@@ -46,7 +47,7 @@ function TaskManagement() {
     }, [hasMore]);
 
     useEffect(() => {
-        handleFindTask();
+        handleFindTask(true);
     }, [currentPage]);
 
     return (

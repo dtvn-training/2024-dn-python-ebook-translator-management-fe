@@ -1,6 +1,7 @@
 import { Card as CardAnt, Tooltip } from 'antd';
 import Button from './Button';
 import { memo } from 'react';
+import { formatMoney } from '~/utils/formatMoney';
 
 function Card({ title, language, deadline, type, author, to = '', button, salary, hasWarning = true, onClick }) {
     const isOverDeadline = new Date().getTime() > new Date(deadline).getTime() && hasWarning;
@@ -24,7 +25,7 @@ function Card({ title, language, deadline, type, author, to = '', button, salary
                     Author: <span>{author}</span>
                 </p>
             )}
-            {salary && <p>Salary: {salary} VND</p>}
+            {salary && <p>Salary: {formatMoney(salary)}</p>}
             <Button onClick={onClick} white={isOverDeadline} className={`mt-2`} to={to}>
                 {button}
             </Button>
