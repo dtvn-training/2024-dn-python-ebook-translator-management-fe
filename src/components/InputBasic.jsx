@@ -1,7 +1,7 @@
 import { DatePicker, Input, Select } from 'antd';
 import dayjs from 'dayjs';
 import Button from '~/components/Button';
-import { inputKey } from '~/routes/inputReducer';
+import { inputKey } from '~/utils/inputReducer';
 
 function InputBasic({ dispatch, state }) {
     const { title, type, language, date, status } = state;
