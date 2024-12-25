@@ -4,7 +4,7 @@ import { Avatar, Layout, Menu } from 'antd';
 import { FaAddressBook, FaRegBell } from 'react-icons/fa6';
 import { Link } from 'react-router-dom';
 import { Footer } from 'antd/es/layout/layout';
-import { TASK_MANAGEMENT } from '~/utils/constants';
+import { PROGRESS_TRACKING, TASK_MANAGEMENT } from '~/utils/constants';
 const { Header, Content, Sider } = Layout;
 
 const sider = [
@@ -24,7 +24,11 @@ const sider = [
     },
     {
         key: 3,
-        label: <Link className="text-base">Translation progress</Link>,
+        label: (
+            <Link to={PROGRESS_TRACKING} className="text-base">
+                Translation progress
+            </Link>
+        ),
         icon: <LineChartOutlined style={{ fontSize: '20px' }} />,
     },
 ];
