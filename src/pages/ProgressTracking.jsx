@@ -37,12 +37,8 @@ const columns = [
         dataIndex: 'detail',
         key: 'detail',
         width: '10%',
-        render: (text, record) => (
-            <Link
-                onClick={() => {
-                    console.log(record);
-                }}
-            >
+        render: () => (
+            <Link>
                 <AiOutlineLink className="text-2xl text-blue-500" />
             </Link>
         ),
