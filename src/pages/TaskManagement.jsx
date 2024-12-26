@@ -1,7 +1,7 @@
 import { useReducer } from 'react';
 import Card from '~/components/Card';
 import InputBasic from '~/components/InputBasic';
-import { initState, inputReducer } from '~/routes/inputReducer';
+import { initState, inputReducer } from '~/utils/inputReducer';
 
 const arr = new Array(23).fill(null);
 
