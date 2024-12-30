@@ -40,8 +40,6 @@ const Create_task = () => {
                     const firstBook = res_book.data[0];
                     setSelectedBook(firstBook.book_id);
                 }
-            } else {
-                console.log('Error fetching books:', res_book.status);
             }
         } catch (error) {
             console.error('Error fetching books:', error);
@@ -117,8 +115,6 @@ const Create_task = () => {
                 setError('There was an issue creating the tasks. Please try again later.');
                 return;
             }
-
-            console.log('Tasks created successfully:', response.data);
             showAlert('Tasks created successfully!', 'success');
 
             setChapters([]);
@@ -128,9 +124,7 @@ const Create_task = () => {
             setDeadline({});
             setSalary({});
         } catch (error) {
-            console.error('Error creating tasks:', error);
             setError('Create Tasks Fail!');
-            showAlert('There was an error creating the tasks.', 'error');
         }
     };
 

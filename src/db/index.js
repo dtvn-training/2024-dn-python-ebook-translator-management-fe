@@ -3,7 +3,6 @@ const config = axios.create({
     baseURL: 'http://localhost:5000/api',
     headers: {
         'Content-Type': 'application/json',
-        // methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     },
     timeout: 10000,
 });
