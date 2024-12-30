@@ -5,6 +5,7 @@ import { Link, useParams } from 'react-router-dom';
 import { DOWNLOAD_FILE, progressTrackingDetail } from '~/utils/urlApi';
 import { get } from '~/db';
 import formatDay from '~/utils/formatDay';
+import { COMPLETED, PENDING } from '~/utils/status';
 
 const columns = [
     {
@@ -71,14 +72,14 @@ function ProgressTrackingDetail() {
                 let details = data.details.map((item) => {
                     let status = item.task_category;
                     if (item.is_completed) {
-                        status = 'Completed';
+                        status = COMPLETED;
                     }
                     return {
                         key: item.chapter_id,
                         title: item.title,
-                        taskOwner: item.fullname ? item.fullname : 'Pending',
-                        deadline: item.deadline ? formatDay(item.deadline) : 'Pending',
-                        status: status ? status : 'Pending',
+                        taskOwner: item.fullname ? item.fullname : PENDING,
+                        deadline: item.deadline ? formatDay(item.deadline) : PENDING,
+                        status: status ? status : PENDING,
                         chapter: item.chapter_position,
                         filename: item?.filename,
                     };
