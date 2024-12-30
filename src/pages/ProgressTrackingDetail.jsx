@@ -1,6 +1,10 @@
 import { Button, Pagination, Table, Tag } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { DOWNLOAD_FILE, progressTrackingDetail } from '~/utils/urlApi';
+import { get } from '~/db';
+import formatDay from '~/utils/formatDay';
 
 const columns = [
     {
@@ -8,6 +12,9 @@ const columns = [
         dataIndex: 'chapter',
         key: 'chapter',
         width: '10%',
+        render: (text) => {
+            return <p>{'Chapter ' + text}</p>;
+        },
     },
     {
         title: 'Title',
@@ -37,51 +44,57 @@ const columns = [
         title: 'Download',
         key: 'download',
         width: '5%',
-        render: () => <Button type="link" icon={<DownloadOutlined />} />,
-    },
-];
-
-const data = [
-    {
-        key: '1',
-        chapter: 'Chapter 1',
-        title: 'Introduction to Ant Design',
-        taskOwner: 'John Doe',
-        deadline: '2024-12-30',
-        status: 'Completed',
-    },
-    {
-        key: '2',
-        chapter: 'Chapter 2',
-        title: 'Understanding Table Components',
-        taskOwner: 'Jane Smith',
-        deadline: '2025-01-05',
-        status: 'In Progress',
-    },
-    {
-        key: '3',
-        chapter: 'Chapter 3',
-        title: 'Advanced Usage of Ant Design',
-        taskOwner: 'Mike Johnson',
-        deadline: '2025-01-10',
-        status: 'Pending',
+        render: (text, record) => {
+            return (
+                <Link
+                    to={record.filename ? `${DOWNLOAD_FILE}/${record.filename}` : ''}
+                    className={`text-blue-500 ${!record.filename ? 'opacity-55' : ''}`}
+                    type="link"
+                >
+                    <DownloadOutlined />
+                </Link>
+            );
+        },
     },
 ];
 
 function ProgressTrackingDetail() {
     const [book, setBook] = useState();
+    const [dataSource, setDataSource] = useState([]);
+    const { book_id } = useParams();
     useEffect(() => {
         (async () => {
-            
+            const res = await get(`${progressTrackingDetail}/${book_id}`);
+            if (res.status === 200) {
+                const data = res.data.data;
+                setBook(data.book);
+                let details = data.details.map((item) => {
+                    let status = item.task_category;
+                    if (item.is_completed) {
+                        status = 'Completed';
+                    }
+                    return {
+                        key: item.chapter_id,
+                        title: item.title,
+                        taskOwner: item.fullname ? item.fullname : 'Pending',
+                        deadline: item.deadline ? formatDay(item.deadline) : 'Pending',
+                        status: status ? status : 'Pending',
+                        chapter: item.chapter_position,
+                        filename: item?.filename,
+                    };
+                });
+                details = details.sort((a, b) => a.chapter - b.chapter);
+                setDataSource(details);
+            }
         })();
     }, []);
     return (
         <div className="space-y-2">
-            <h1 className="font-medium">Doraemon and his friends</h1>
-            <h3>Language: English</h3>
+            <h1 className="font-medium">{book?.title}</h1>
+            <h3>Language: {book?.language}</h3>
             <h3>Completed tasks: Chapter1, Chapter2</h3>
             <h3>Completed percentage: 80%</h3>
-            <Table pagination={false} className="pt-4 w-[98%] m-auto" columns={columns} dataSource={data} />
+            <Table pagination={false} className="pt-4 w-[98%] m-auto" columns={columns} dataSource={dataSource} />
         </div>
     );
 }

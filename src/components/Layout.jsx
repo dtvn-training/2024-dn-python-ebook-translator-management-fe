@@ -4,7 +4,6 @@ import { Avatar, Layout, Menu } from 'antd';
 import { FaAddressBook, FaRegBell } from 'react-icons/fa6';
 import { Link } from 'react-router-dom';
 import { Footer } from 'antd/es/layout/layout';
-import { pathname } from '~/routes/pathname';
 const { Header, Content, Sider } = Layout;
 
 const sider = [
@@ -15,11 +14,7 @@ const sider = [
     },
     {
         key: 2,
-        label: (
-            <Link to={pathname.TASK_MANAGEMENT} className="text-base">
-                Task management
-            </Link>
-        ),
+        label: <Link className="text-base">Task management</Link>,
         icon: <ContainerOutlined style={{ fontSize: '20px' }} />,
     },
     {
