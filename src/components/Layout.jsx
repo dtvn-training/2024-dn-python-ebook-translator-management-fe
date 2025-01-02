@@ -5,6 +5,7 @@ import { FaAddressBook, FaRegBell } from 'react-icons/fa6';
 import { Link } from 'react-router-dom';
 import { Footer } from 'antd/es/layout/layout';
 import { PROGRESS_TRACKING, TASK_MANAGEMENT } from '~/utils/constants';
+import { ADMIN } from '~/utils/role';
 const { Header, Content, Sider } = Layout;
 
 const sider = [
@@ -13,6 +14,9 @@ const sider = [
         label: <Link className="text-base">All Tasks</Link>,
         icon: <SolutionOutlined style={{ fontSize: '20px' }} />,
     },
+];
+
+const siderAdmin = [
     {
         key: 2,
         label: (
@@ -32,6 +36,7 @@ const sider = [
         icon: <LineChartOutlined style={{ fontSize: '20px' }} />,
     },
 ];
+
 const LayoutComponet = ({ children }) => {
     return (
         <Layout>
@@ -70,7 +75,7 @@ const LayoutComponet = ({ children }) => {
                             borderRight: 0,
                             marginTop: '10px',
                         }}
-                        items={sider}
+                        items={+localStorage.getItem('role') === ADMIN ? [...sider, ...siderAdmin] : sider}
                     />
                 </Sider>
                 <Layout

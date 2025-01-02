@@ -6,6 +6,7 @@ import { IoCloudUploadOutline } from 'react-icons/io5';
 import ButtonCustom from '~/components/Button';
 import { ADDCHAPTER, chapterReducer, CLEAR, FILE, initChapter, REMOVECHAPTER, TITLE } from '~/utils/chapterReducer';
 import { chapterValidation, ebookValidation } from '~/validations/uploadEbook';
+import { optionAuth, optionFormAndAuth } from '~/utils/optionFormData';
 
 function UploadEbook() {
     const titleId = useId();
@@ -50,10 +51,14 @@ function UploadEbook() {
                 );
             }
             await Promise.all(chapterValidations);
-            const resBook = await post(uploadBook, {
-                title: ebook.title,
-                language_id: ebook.languageId,
-            });
+            const resBook = await post(
+                uploadBook,
+                {
+                    title: ebook.title,
+                    language_id: ebook.languageId,
+                },
+                optionAuth,
+            );
 
             if (resBook.status === 201) {
                 let uploadChapter = [];
@@ -64,13 +69,7 @@ function UploadEbook() {
                     formData.append('chapter_title', chapter.title);
                     formData.append('file_content', chapter.file[0]);
                     formData.append('chapter_position', i + 1);
-                    uploadChapter.push(
-                        post(uploadChapterUrl, formData, {
-                            headers: {
-                                'Content-Type': 'multipart/form-data',
-                            },
-                        }),
-                    );
+                    uploadChapter.push(post(uploadChapterUrl, formData, optionFormAndAuth));
                 }
 
                 const responses = await Promise.all(uploadChapter);

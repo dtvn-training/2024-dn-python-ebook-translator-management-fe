@@ -6,6 +6,7 @@ import { DOWNLOAD_FILE, progressTrackingDetail } from '~/utils/urlApi';
 import { get } from '~/db';
 import formatDay from '~/utils/formatDay';
 import { COMPLETED, PENDING } from '~/utils/status';
+import { optionAuth } from '~/utils/optionFormData';
 
 const columns = [
     {
@@ -65,7 +66,7 @@ function ProgressTrackingDetail() {
     const { book_id } = useParams();
     useEffect(() => {
         (async () => {
-            const res = await get(`${progressTrackingDetail}/${book_id}`);
+            const res = await get(`${progressTrackingDetail}/${book_id}`, optionAuth);
             if (res.status === 200) {
                 const data = res.data.data;
                 setBook(data.book);

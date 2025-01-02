@@ -27,7 +27,10 @@ function Login({ setShowContainer, REGISTER }) {
             if (res.status === 200) {
                 alert('Login successfully');
                 const data = res.data.data;
-                localStorage.setItem('username', data.username);
+                localStorage.setItem('username', data.user.username);
+                localStorage.setItem('role', data.user.role);
+                localStorage.setItem('profile', data.user.profile_id);
+                localStorage.setItem('user', data.user.user_id);
                 localStorage.setItem('accessToken', data.access_token);
                 localStorage.setItem('refreshToken', data.refresh_token);
                 navigate(HOME_PAGE);
