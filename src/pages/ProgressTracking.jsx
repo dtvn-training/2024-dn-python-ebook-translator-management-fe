@@ -5,6 +5,7 @@ import { get } from '~/db';
 import { getLanguage, progressTracking } from '~/utils/urlApi';
 import { AiOutlineLink } from 'react-icons/ai';
 import { LIMIT_PROGRESS_TRACKING } from '~/utils/pagination';
+import { PROGRESS_TRACKING_DETAIL } from '~/utils/constants';
 
 const columns = [
     {
@@ -17,31 +18,35 @@ const columns = [
         title: 'Language',
         dataIndex: 'language',
         key: 'language',
-        width: '15%',
+        width: '10%',
+        align: 'center',
     },
     {
         title: 'Total tasks',
         dataIndex: 'totalTasks',
         key: 'totalTasks',
         width: '10%',
+        align: 'center',
     },
     {
         title: 'Completed Percentage',
         dataIndex: 'completedPercentage',
         key: 'completedPercentage',
-        width: '10%',
+        width: '15%',
         render: (text) => `${Math.ceil(text)}%`,
+        align: 'center',
     },
     {
         title: 'Detail',
         dataIndex: 'detail',
         key: 'detail',
         width: '10%',
-        render: () => (
-            <Link>
+        render: (text, record) => (
+            <Link className="flex justify-center" to={`${PROGRESS_TRACKING_DETAIL}/${record.key}`}>
                 <AiOutlineLink className="text-2xl text-blue-500" />
             </Link>
         ),
+        align: 'center',
     },
 ];
 

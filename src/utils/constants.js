@@ -3,3 +3,7 @@ export const TASK_MANAGEMENT = '/task-management';
 export const UPLOAD_EBOOK = '/upload-ebook';
 export const PROGRESS_TRACKING_DETAIL = '/progress-tracking-detail';
 export const PROGRESS_TRACKING = '/progress-tracking';
+export const DASHBOARD = '/dashboard';
+export const MY_TASK = '/my-task';
+export const TRANSCRIPT_TASK = '/transcript-task';
+export const REGISTER_TASK = '/register-task';
