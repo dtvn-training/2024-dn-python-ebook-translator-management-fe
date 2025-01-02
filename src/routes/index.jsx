@@ -10,7 +10,7 @@ function Router() {
             {/* <ToastContainer /> */}
             <Routes>
                 {memberPage.map((item, index) => {
-                    const Item = item.Element;  
+                    const Item = item.Element;
                     return item?.noLayout ? (
                         <Route
                             key={index}

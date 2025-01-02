@@ -5,6 +5,8 @@ import { get } from '~/db';
 import { getLanguage, progressTracking } from '~/utils/urlApi';
 import { AiOutlineLink } from 'react-icons/ai';
 import { LIMIT_PROGRESS_TRACKING } from '~/utils/pagination';
+import { optionAuth } from '~/utils/optionFormData';
+import { PROGRESS_TRACKING_DETAIL } from '~/utils/constants';
 
 const columns = [
     {
@@ -37,8 +39,8 @@ const columns = [
         dataIndex: 'detail',
         key: 'detail',
         width: '10%',
-        render: () => (
-            <Link>
+        render: (text, record) => (
+            <Link to={`${PROGRESS_TRACKING_DETAIL}/${record.key}`}>
                 <AiOutlineLink className="text-2xl text-blue-500" />
             </Link>
         ),
@@ -58,7 +60,7 @@ function ProgressTracking() {
     useEffect(() => {
         (async () => {
             const res = await get(getLanguage);
-            if (res.status === 200) {
+            if (res?.status === 200) {
                 setOptionLanguages(res.data);
             }
             handleFind(true);
@@ -71,8 +73,9 @@ function ProgressTracking() {
         }
         const progress = await get(
             `${progressTracking}?key=${bookTitle}&language=${language}&current_page=${currentPage}&limit=${LIMIT_PROGRESS_TRACKING}`,
+            optionAuth,
         );
-        if (progress.status === 200) {
+        if (progress?.status === 200) {
             const data = progress.data.data;
 
             const dataSource = data.information.map((item) => {
