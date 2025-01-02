@@ -1,32 +1,46 @@
 import React from 'react';
 import { ContainerOutlined, LineChartOutlined, SolutionOutlined } from '@ant-design/icons';
-import { Avatar, Layout, Menu } from 'antd';
+import { Avatar, Layout, Menu, Popover } from 'antd';
 import { FaAddressBook, FaRegBell } from 'react-icons/fa6';
 import { Link } from 'react-router-dom';
 import { Footer } from 'antd/es/layout/layout';
-import { PROGRESS_TRACKING, TASK_MANAGEMENT } from '~/utils/constants';
+import { DASHBOARD, HOME_PAGE, MY_TASK, PROGRESS_TRACKING, REGISTER_TASK, UPLOAD_EBOOK } from '~/utils/constants';
+import { AiOutlineHome } from 'react-icons/ai';
 const { Header, Content, Sider } = Layout;
 
 const sider = [
     {
         key: 1,
-        label: <Link className="text-base">All Tasks</Link>,
-        icon: <SolutionOutlined style={{ fontSize: '20px' }} />,
+        label: (
+            <Link to={HOME_PAGE} className="text-base">
+                Home
+            </Link>
+        ),
+        icon: <AiOutlineHome style={{ fontSize: '20px' }} />,
     },
     {
         key: 2,
         label: (
-            <Link to={TASK_MANAGEMENT} className="text-base">
+            <Link to={REGISTER_TASK} className="text-base">
+                All Tasks
+            </Link>
+        ),
+        icon: <SolutionOutlined style={{ fontSize: '20px' }} />,
+    },
+    {
+        key: 3,
+        label: (
+            <Link to={PROGRESS_TRACKING} className="text-base">
                 Task management
             </Link>
         ),
         icon: <ContainerOutlined style={{ fontSize: '20px' }} />,
     },
     {
-        key: 3,
+        key: 4,
         label: (
-            <Link to={PROGRESS_TRACKING} className="text-base">
-                Translation progress
+            <Link to={DASHBOARD} className="text-base">
+                Dashboard
             </Link>
         ),
         icon: <LineChartOutlined style={{ fontSize: '20px' }} />,
@@ -48,10 +62,21 @@ const LayoutComponet = ({ children }) => {
                         <button className="text-2xl">
                             <FaRegBell />
                         </button>
-                        <button className="text-2xl">
+                        <Link to={MY_TASK} className="text-2xl">
                             <FaAddressBook />
-                        </button>
-                        <Avatar size={30}>User</Avatar>
+                        </Link>
+                        <Popover
+                            placement="bottomLeft"
+                            content={
+                                <>
+                                    <Link to={UPLOAD_EBOOK}>Upload Ebook</Link>
+                                </>
+                            }
+                        >
+                            <Avatar className="cursor-pointer" size={30}>
+                                User
+                            </Avatar>
+                        </Popover>
                     </div>
                 </div>
             </Header>

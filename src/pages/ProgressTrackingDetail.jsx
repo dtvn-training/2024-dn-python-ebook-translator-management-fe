@@ -1,11 +1,11 @@
 import { Button, Pagination, Table, Tag } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { DOWNLOAD_FILE, progressTrackingDetail } from '~/utils/urlApi';
 import { get } from '~/db';
 import formatDay from '~/utils/formatDay';
-import { COMPLETED, PENDING } from '~/utils/status';
+import { COMPLETED, PENDING, UNCOMPLETED } from '~/utils/status';
 
 const columns = [
     {
@@ -21,25 +21,28 @@ const columns = [
         title: 'Title',
         dataIndex: 'title',
         key: 'title',
-        width: '30%',
+        width: '35%',
     },
     {
         title: 'Task Owner',
         dataIndex: 'taskOwner',
         key: 'taskOwner',
-        width: '20%',
+        width: '15%',
+        align: 'center',
     },
     {
         title: 'Deadline',
         dataIndex: 'deadline',
         key: 'deadline',
         width: '10%',
+        align: 'center',
     },
     {
         title: 'Status',
         dataIndex: 'status',
         key: 'status',
         width: '10%',
+        align: 'center',
     },
     {
         title: 'Download',
@@ -56,6 +59,7 @@ const columns = [
                 </Link>
             );
         },
+        align: 'center',
     },
 ];
 
@@ -89,12 +93,27 @@ function ProgressTrackingDetail() {
             }
         })();
     }, []);
+
+    const { chapterCompleted, percentage } = useMemo(() => {
+        let chapter = [];
+        dataSource.forEach((item) => {
+            if (item.status === COMPLETED) chapter.push(`chapter ${item.chapter}`);
+        });
+        const chapterPercentage = chapter.length > 0 ? Math.ceil((chapter.length / dataSource.length) * 100) : 0;
+        chapter = chapter.join(', ');
+        chapter.slice(0, 1);
+        return {
+            chapterCompleted: chapter === '' ? UNCOMPLETED : chapter,
+            percentage: chapterPercentage,
+        };
+    }, [JSON.stringify(dataSource)]);
+
     return (
         <div className="space-y-2">
             <h1 className="font-medium">{book?.title}</h1>
             <h3>Language: {book?.language}</h3>
-            <h3>Completed tasks: Chapter1, Chapter2</h3>
-            <h3>Completed percentage: 80%</h3>
+            <h3>Completed tasks: {chapterCompleted}</h3>
+            <h3>Completed percentage: {percentage}%</h3>
             <Table pagination={false} className="pt-4 w-[98%] m-auto" columns={columns} dataSource={dataSource} />
         </div>
     );
