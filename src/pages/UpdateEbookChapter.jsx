@@ -13,6 +13,7 @@ import {
 import { IoCloudUploadOutline } from 'react-icons/io5';
 import ButtonCustom from '~/components/Button';
 import { Link, useParams } from 'react-router-dom';
+import Dialog from '~/components/Dialog';
 
 function UploadEbook() {
     const titleId = useId();
@@ -23,6 +24,11 @@ function UploadEbook() {
         id: '',
     });
     const [chapters, setChapters] = useState([]);
+    const [{ loading, open, index }, setDialog] = useState({
+        loading: false,
+        open: false,
+        index: null,
+    });
     const bookId = useParams().id;
 
     const handleChangeEbook = (object) => {
@@ -45,8 +51,9 @@ function UploadEbook() {
         });
     };
 
-    const handleRemoveChapter = async (index) => {
+    const handleRemoveChapter = async () => {
         try {
+            setDialog((prev) => ({ ...prev, loading: true }));
             const chapter = chapters[index];
             if (chapter.id) {
                 const resDelete = await post(`${deleteChapter}/${chapter.id}`);
@@ -60,9 +67,10 @@ function UploadEbook() {
             }
         } catch (error) {
             if (error.status === 400) {
-                alert('Chapter cannot be deleted due to existing translations.');
-                return;
+                alert(error.response.data.message);
             }
+        } finally {
+            setDialog({ loading: false, index: null, open: false });
         }
     };
 
@@ -146,6 +154,14 @@ function UploadEbook() {
 
     return (
         <div className="w-[60%] space-y-4">
+            <Dialog
+                confirmLoading={loading}
+                content={'Are you sure you want to remove this chapter?'}
+                title={'Remove chapter'}
+                open={open}
+                handleOk={handleRemoveChapter}
+                setOpen={(value) => setDialog((prev) => ({ ...prev, open: value }))}
+            />
             <h1 className="font-medium text-[16px]">Upload E-book</h1>
             <div className="space-y-3">
                 <div className="space-y-1">
@@ -188,7 +204,7 @@ function UploadEbook() {
                         <h1 className="font-medium text-[16px] ">Chapter {index + 1}</h1>
                         <button
                             onClick={() => {
-                                handleRemoveChapter(index);
+                                setDialog((prev) => ({ ...prev, open: true, index: index }));
                             }}
                             className="italic underline"
                         >
