@@ -6,6 +6,7 @@ import { DOWNLOAD_FILE, progressTrackingDetail } from '~/utils/urlApi';
 import { get } from '~/db';
 import formatDay from '~/utils/formatDay';
 import { COMPLETED, PENDING } from '~/utils/status';
+import CustomTag from '~/components/CustomTag';
 
 const columns = [
     {
@@ -28,6 +29,7 @@ const columns = [
         dataIndex: 'taskOwner',
         key: 'taskOwner',
         width: '20%',
+        render: (text) => (text === PENDING ? <CustomTag type={text} /> : text),
     },
     {
         title: 'Deadline',
@@ -39,6 +41,7 @@ const columns = [
         title: 'Status',
         dataIndex: 'status',
         key: 'status',
+        render: (text) => <CustomTag type={text} />,
         width: '10%',
     },
     {
