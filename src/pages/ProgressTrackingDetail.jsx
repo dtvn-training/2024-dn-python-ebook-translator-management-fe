@@ -1,11 +1,11 @@
-import { Button, Pagination, Table, Tag } from 'antd';
+import { Table } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { DOWNLOAD_FILE, progressTrackingDetail } from '~/utils/urlApi';
 import { get } from '~/db';
 import formatDay from '~/utils/formatDay';
-import { COMPLETED, PENDING } from '~/utils/status';
+import { COMPLETED, PENDING, REVIEW, TRANSLATION } from '~/utils/status';
 import CustomTag from '~/components/CustomTag';
 
 const columns = [
@@ -94,10 +94,28 @@ function ProgressTrackingDetail() {
     }, []);
     return (
         <div className="space-y-2">
-            <h1 className="font-medium">{book?.title}</h1>
-            <h3>Language: {book?.language}</h3>
-            <h3>Completed tasks: Chapter1, Chapter2</h3>
-            <h3>Completed percentage: 80%</h3>
+            <div className="flex justify-between">
+                <div>
+                    <h1 className="font-medium">{book?.title}</h1>
+                    <h3>Language: {book?.language}</h3>
+                    <h3>Completed tasks: Chapter1, Chapter2</h3>
+                    <h3>Completed percentage: 80%</h3>
+                </div>
+                <div className="flex space-x-2 items-end">
+                    <h4 className="text-base font-medium">Status:</h4>
+                    <ul className="flex items-end">
+                        <li>
+                            <CustomTag type={TRANSLATION} />
+                        </li>
+                        <li>
+                            <CustomTag type={REVIEW} />
+                        </li>
+                        <li>
+                            <CustomTag type={COMPLETED} />
+                        </li>
+                    </ul>
+                </div>
+            </div>
             <Table pagination={false} className="pt-4 w-[98%] m-auto" columns={columns} dataSource={dataSource} />
         </div>
     );
