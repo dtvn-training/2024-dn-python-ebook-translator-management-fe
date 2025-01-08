@@ -1,0 +1,39 @@
+.label-underline {
+    position: relative;
+}
+
+.label-underline::before {
+    content: '';
+    position: absolute;
+    width: 0px;
+    height: 2px;
+    background-color: white;
+    top: 100%;
+    transition: all 0.5s ease-in-out;
+}
+
+.label-underline:hover::before {
+    width: 100%;
+}
+
+.image-animation {
+    animation: image 3s linear infinite;
+}
+
+@keyframes image {
+    0% {
+        transform: translateY(10px);
+    }
+    25% {
+        transform: translate(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+    75% {
+        transform: translate(0);
+    }
+    100% {
+        transform: translateY(10px);
+    }
+}
