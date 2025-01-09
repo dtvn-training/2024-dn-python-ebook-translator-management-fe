@@ -17,3 +17,5 @@ export const uploadContent = '/content/upload';
 export const getComment = '/comment';
 export const confirmComment = '/comment/confirm-comment';
 export const getMyTask = '/task/my-task'
+export const progressTrackingDetail = '/ebook/progress-tracking-detail';
+export const progressTracking = '/ebook/progress-tracking';
