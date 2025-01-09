@@ -8,6 +8,8 @@ import formatDay from '~/utils/formatDay';
 import { initState, inputReducer } from '~/utils/inputReducer';
 import { taskManagementUrl } from '~/utils/urlApi';
 
+const arr = new Array(23).fill(null);
+
 function TaskManagement() {
     const [state, dispatch] = useReducer(inputReducer, initState);
     const [tasks, setTasks] = useState([]);

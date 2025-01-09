@@ -1,5 +1,5 @@
 import { Route, Routes } from 'react-router-dom';
-import { managerPage, memberPage } from './customPage';
+import { adminPage, memberPage } from './customPage';
 import ScrollTop from '../components/ScrollTop';
 import LazyLoading from '../components/LazyLoading';
 import Layout from '../components/Layout';
@@ -10,7 +10,7 @@ function Router() {
             {/* <ToastContainer /> */}
             <Routes>
                 {memberPage.map((item, index) => {
-                    const Item = item.Element;
+                    const Item = item.Element;  
                     return item?.noLayout ? (
                         <Route
                             key={index}
@@ -35,7 +35,7 @@ function Router() {
                         ></Route>
                     );
                 })}
-                {managerPage.map((item, index) => {
+                {adminPage.map((item, index) => {
                     const Item = item.Element;
                     return item?.noLayout ? (
                         <Route

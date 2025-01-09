@@ -1,0 +1,1 @@
+export const LIMIT_PROGRESS_TRACKING = 6;
