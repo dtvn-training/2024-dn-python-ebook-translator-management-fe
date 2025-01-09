@@ -2,8 +2,8 @@ import { Link } from 'react-router-dom';
 
 function Button({ children, className, to, white, green, blue, ...props }) {
     const bgWhite = '!bg-white ';
-    const bgGreen = '!bg-green-500 ';
-    const bgBlue = '!bg-blue-200 ';
+    const bgGreen = '!bg-green-500 !text-white hover:!text-white ';
+    const bgBlue = '!bg-blue-200 !text-white hover:!text-white ';
     let style = 'bg-default_bt hover:text-black px-4 py-1 rounded-lg hover:opacity-60 inline-block ';
     white && (style += bgWhite);
     green && (style += bgGreen);
