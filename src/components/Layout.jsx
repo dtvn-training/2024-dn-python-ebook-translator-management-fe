@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ContainerOutlined, LineChartOutlined, SolutionOutlined } from '@ant-design/icons';
-import { Avatar, Layout, Menu } from 'antd';
+import { Avatar, Button, Layout, Menu, Popover } from 'antd';
 import { FaAddressBook, FaRegBell } from 'react-icons/fa6';
 import { Link } from 'react-router-dom';
 import { Footer } from 'antd/es/layout/layout';
 import { PROGRESS_TRACKING, TASK_MANAGEMENT } from '~/utils/constants';
+import EditProfile from './EditProfile';
 const { Header, Content, Sider } = Layout;
 
 const sider = [
@@ -33,8 +34,10 @@ const sider = [
     },
 ];
 const LayoutComponet = ({ children }) => {
+    const [showProfile, setShowProfile] = useState(false);
     return (
         <Layout>
+            {showProfile && <EditProfile setShowProfile={setShowProfile} />}
             <Header
                 style={{
                     display: 'flex',
@@ -51,7 +54,18 @@ const LayoutComponet = ({ children }) => {
                         <button className="text-2xl">
                             <FaAddressBook />
                         </button>
-                        <Avatar size={30}>User</Avatar>
+                        <Popover
+                            placement="bottomLeft"
+                            content={
+                                <>
+                                    <Button onClick={() => setShowProfile(true)} type="text">
+                                        Edit profile
+                                    </Button>
+                                </>
+                            }
+                        >
+                            <Avatar size={30}>User</Avatar>
+                        </Popover>
                     </div>
                 </div>
             </Header>
