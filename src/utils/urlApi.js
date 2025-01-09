@@ -1,3 +1,7 @@
+export const taskCategoryUrl = '/task-category';
+export const taskManagementUrl = (title = '', deadline = '', type = '') => {
+    return `/task?key=${title}&deadline=${deadline}&task_category_id=${type}`;
+};
 export const getLanguage = '/language';
 export const uploadBook = '/ebook/upload';
 export const uploadChapterUrl = '/chapter/upload';

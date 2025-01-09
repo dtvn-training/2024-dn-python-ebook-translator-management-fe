@@ -11,7 +11,7 @@ export const initState = {
     title: '',
     type: '',
     language: '',
-    date: new Date(),
+    date: '',
     status: '',
 };
 
