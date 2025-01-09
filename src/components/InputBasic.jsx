@@ -36,82 +36,80 @@ function InputBasic({ dispatch, state, handleFind, isLanguage }) {
     }, []);
 
     return (
-        <>
-            <div className="flex justify-between space-x-3">
-                <Input
-                    value={title}
-                    onChange={(e) => {
-                        dispatch({
-                            type: inputKey.ADDTITLE,
-                            value: e.target.value,
-                        });
-                    }}
-                    placeholder="Add chapter name"
-                    className="lg:!w-[40%] xl:!w-[50%] 2xl:!w-[60%]"
-                />
+        <div className="flex justify-between space-x-3">
+            <Input
+                value={title}
+                onChange={(e) => {
+                    dispatch({
+                        type: inputKey.ADDTITLE,
+                        value: e.target.value,
+                    });
+                }}
+                placeholder="Add chapter name"
+                className="lg:!w-[40%] xl:!w-[50%] 2xl:!w-[60%]"
+            />
 
+            <Select
+                className="!flex-1"
+                onChange={(e) => {
+                    dispatch({
+                        type: inputKey.ADDTYPE,
+                        value: e,
+                    });
+                }}
+                value={type}
+                defaultValue={type}
+                options={[
+                    {
+                        value: '',
+                        label: 'Type',
+                    },
+                    ...taskCategory.map((item) => ({
+                        value: item.task_category_id,
+                        label: item.title,
+                    })),
+                ]}
+            />
+
+            {isLanguage ? (
                 <Select
                     className="!flex-1"
+                    defaultValue={language}
                     onChange={(e) => {
-                        dispatch({
-                            type: inputKey.ADDTYPE,
-                            value: e,
-                        });
+                        dispatch({ type: inputKey.ADDLANGUAGE, value: e });
                     }}
-                    value={type}
-                    defaultValue={type}
+                    value={language}
                     options={[
                         {
                             value: '',
-                            label: 'Type',
+                            label: 'Language',
                         },
-                        ...taskCategory.map((item) => ({
-                            value: item.task_category_id,
+                        ...languages.map((item) => ({
+                            value: item.language_id,
                             label: item.title,
                         })),
                     ]}
                 />
-
-                {isLanguage ? (
-                    <Select
-                        className="!flex-1"
-                        defaultValue={language}
-                        onChange={(e) => {
-                            dispatch({ type: inputKey.ADDLANGUAGE, value: e });
-                        }}
-                        value={language}
-                        options={[
-                            {
-                                value: '',
-                                label: 'Language',
-                            },
-                            ...languages.map((item) => ({
-                                value: item.language_id,
-                                label: item.title,
-                            })),
-                        ]}
-                    />
-                ) : (
-                    <DatePicker
-                        onChange={(e) => {
-                            dispatch({
-                                type: inputKey.ADDDATE,
-                                value: e?.$d || '',
-                            });
-                        }}
-                        format={'MM/DD/YYYY'}
-                    />
-                )}
-
-                <Button
-                    onClick={() => {
-                        handleFind();
+            ) : (
+                <DatePicker
+                    onChange={(e) => {
+                        dispatch({
+                            type: inputKey.ADDDATE,
+                            value: e?.$d || '',
+                        });
                     }}
-                >
-                    Find
-                </Button>
-            </div>
-        </>
+                    format={'MM/DD/YYYY'}
+                />
+            )}
+
+            <Button
+                onClick={() => {
+                    handleFind();
+                }}
+            >
+                Find
+            </Button>
+        </div>
     );
 }
 
