@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Bar, Line } from 'react-chartjs-2';
 import { Link } from 'react-router-dom';
+import { getDashboard, getTable } from '~/utils/urlApi';
 import { Table } from 'antd';
 import { get } from '~/db';
 import {
@@ -25,18 +26,21 @@ import {
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend);
 
 const Home = () => {
-    const [dashboardData, setDashboardData] = useState({
+    const initDashboardData = {
         task_summary: { total_task: 0, completed_task: 0, uncompleted_task: 0 },
         count_task_per_day: {},
         tasks_per_day_current_month: {},
         tasks_per_day_last_month: {},
         count_task_of_month: { total_tasks: 0, total_completed: 0, total_uncompleted: 0 },
-    });
+    };
+
+    const [dashboardData, setDashboardData] = useState(initDashboardData);
+
     const [tasks, setTasks] = useState([]);
 
     const loadTableTasks = async () => {
         try {
-            const res = await get('/task/table_tasks');
+            const res = await get(getTable);
             if (res.status === 200) {
                 setTasks(res.data || []);
             }
@@ -47,7 +51,7 @@ const Home = () => {
 
     const loadDashboard = async () => {
         try {
-            const res = await get('/task/dashboard');
+            const res = await get(getDashboard);
             if (res.status === 200) {
                 setDashboardData({
                     task_summary: {
@@ -76,45 +80,49 @@ const Home = () => {
         loadDashboard();
     }, []);
 
+    const getLabelfromDate = (dates) => dates.map((date) => new Date(date).getDate());
+    const getBarDataset = (data, key, label, color) => ({
+        label,
+        data: data.map((dayData) => dayData[key] || 0),
+        backgroundColor: color,
+    });
+
     const barData = {
-        labels: Object.keys(dashboardData.count_task_per_day).map((date) => {
-            const day = new Date(date).getDate();
-            return day.toString();
-        }),
+        labels: getLabelfromDate(Object.keys(dashboardData.count_task_per_day)),
         datasets: [
-            {
-                label: 'Completed Tasks',
-                data: Object.values(dashboardData.count_task_per_day).map((dayData) => dayData.completed || 0),
-                backgroundColor: '#33CC66',
-            },
-            {
-                label: 'Uncompleted Tasks',
-                data: Object.values(dashboardData.count_task_per_day).map((dayData) => dayData.uncompleted || 0),
-                backgroundColor: '#FF0066',
-            },
+            getBarDataset(Object.values(dashboardData.count_task_per_day), 'completed', 'Completed Tasks', '#4bc0c0'),
+            getBarDataset(
+                Object.values(dashboardData.count_task_per_day),
+                'uncompleted',
+                'Uncompleted Tasks',
+                '#ff6f61',
+            ),
         ],
     };
 
+    const getLineDataset = (label, data, borderColor, backgroundColor) => ({
+        label,
+        data,
+        borderColor,
+        backgroundColor,
+        fill: true,
+    });
+
     const lineData = {
-        labels: Object.keys(dashboardData.tasks_per_day_current_month).map((date) => {
-            const day = new Date(date).getDate();
-            return day.toString();
-        }),
+        labels: getLabelfromDate(Object.keys(dashboardData.tasks_per_day_current_month)),
         datasets: [
-            {
-                label: 'This Month Salary',
-                data: Object.values(dashboardData.tasks_per_day_current_month || {}),
-                borderColor: '#4bc0c0',
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                fill: true,
-            },
-            {
-                label: 'Last Month Salary',
-                data: Object.values(dashboardData.tasks_per_day_last_month || {}),
-                borderColor: '#ff6f61',
-                backgroundColor: 'rgba(255, 111, 97, 0.2)',
-                fill: true,
-            },
+            getLineDataset(
+                'This Month Salary',
+                Object.values(dashboardData.tasks_per_day_current_month),
+                '#4bc0c0',
+                'rgba(75, 192, 192, 0.2)',
+            ),
+            getLineDataset(
+                'Last Month Salary',
+                Object.values(dashboardData.tasks_per_day_last_month),
+                '#ff6f61',
+                'rgba(255, 111, 97, 0.2)',
+            ),
         ],
     };
 
@@ -137,39 +145,25 @@ const Home = () => {
         },
     };
 
+    const setColumns = (title, dataIndex, key, render) => ({
+        title,
+        dataIndex,
+        key,
+        render,
+    });
+
     const columns = [
-        {
-            title: 'Ebook',
-            dataIndex: 'ebook',
-            key: 'ebook',
-            render: (text) => <Link to={`/desired-path/${text}`}>{text}</Link>,
-        },
-        {
-            title: 'Chapter',
-            dataIndex: 'chapter',
-            key: 'chapter',
-        },
-        {
-            title: 'Task Owner',
-            dataIndex: 'owner',
-            key: 'owner',
-        },
-        {
-            title: 'Salary',
-            dataIndex: 'salary',
-            key: 'salary',
-        },
-        {
-            title: 'Status',
-            key: 'status',
-            dataIndex: 'status',
-            render: (isCompleted) =>
-                isCompleted ? (
-                    <span style={{ color: '#4bc0c0', fontWeight: 'bold' }}>Completed</span>
-                ) : (
-                    <span style={{ color: '#ff6f61', fontWeight: 'bold' }}>Uncompleted</span>
-                ),
-        },
+        setColumns('Ebook', 'ebook', 'ebook', (text) => <Link to={`/desired-path/${text}`}>{text}</Link>),
+        setColumns('Chapter', 'chapter', 'chapter', (text) => <Link to={`/desired-path/${text}`}>{text}</Link>),
+        setColumns('Task Owner', 'owner', 'onwer', (text) => <Link to={`/desired-path/${text}`}>{text}</Link>),
+        setColumns('Salary', 'salary', 'salary'),
+        setColumns('Status', 'status', 'status', (isCompleted) =>
+            isCompleted ? (
+                <span style={{ color: '#4bc0c0', fontWeight: 'bold' }}>Completed</span>
+            ) : (
+                <span style={{ color: '#ff6f61', fontWeight: 'bold' }}>Uncompleted</span>
+            ),
+        ),
     ];
 
     return (
