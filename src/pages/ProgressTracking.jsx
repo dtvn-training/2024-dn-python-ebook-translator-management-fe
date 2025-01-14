@@ -1,47 +1,67 @@
-import { Button, Input, Pagination, Select, Table } from 'antd';
+import { Button, Input, Pagination, Select, Table, Tag } from 'antd';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { get } from '~/db';
 import { getLanguage, progressTracking } from '~/utils/urlApi';
 import { AiOutlineLink } from 'react-icons/ai';
 import { LIMIT_PROGRESS_TRACKING } from '~/utils/pagination';
+import { statusProgressTracking } from '~/utils/statusProgressTracking';
+import CustomTag from '~/components/CustomTag';
+import { PROGRESS_TRACKING_DETAIL } from '~/utils/constants';
 
 const columns = [
+    {
+        title: 'No',
+        dataIndex: 'index',
+        key: 'index',
+        width: '5%',
+    },
     {
         title: 'Ebook',
         dataIndex: 'ebook',
         key: 'ebook',
-        width: '50%',
+        width: '35%',
+    },
+    {
+        title: 'Chapter',
+        dataIndex: 'chapter',
+        key: 'chapter',
+        width: '10%',
+        align: 'center',
     },
     {
         title: 'Language',
         dataIndex: 'language',
         key: 'language',
-        width: '15%',
+        width: '12%',
+        align: 'center',
     },
     {
         title: 'Total tasks',
         dataIndex: 'totalTasks',
         key: 'totalTasks',
         width: '10%',
+        align: 'center',
     },
     {
-        title: 'Completed Percentage',
-        dataIndex: 'completedPercentage',
-        key: 'completedPercentage',
-        width: '10%',
-        render: (text) => `${Math.ceil(text)}%`,
+        title: 'Status',
+        dataIndex: 'status',
+        key: 'status',
+        render: (text) => <CustomTag type={text} />,
+        width: '13%',
+        align: 'center',
     },
     {
         title: 'Detail',
         dataIndex: 'detail',
         key: 'detail',
         width: '10%',
-        render: () => (
-            <Link>
+        render: (text, record) => (
+            <Link to={`${PROGRESS_TRACKING_DETAIL}/${record.key}`} className="inline-block">
                 <AiOutlineLink className="text-2xl text-blue-500" />
             </Link>
         ),
+        align: 'center',
     },
 ];
 
@@ -75,7 +95,7 @@ function ProgressTracking() {
         if (progress.status === 200) {
             const data = progress.data.data;
 
-            const dataSource = data.information.map((item) => {
+            const dataSource = data.information.map((item, index) => {
                 const chapters = item.chapter;
                 const completedChapter = chapters.reduce((acc, chapter) => {
                     if (chapter.is_completed) {
@@ -88,7 +108,9 @@ function ProgressTracking() {
                     ebook: item.book_title,
                     language: item.language,
                     totalTasks: item.chapter.length,
-                    completedPercentage: chapters.length > 0 ? (completedChapter / chapters.length) * 100 : 0,
+                    chapter: item.total_chapter,
+                    status: statusProgressTracking(completedChapter, chapters.length),
+                    index: index + 1 + (currentPage - 1) * LIMIT_PROGRESS_TRACKING,
                 };
             });
             setDataTable(dataSource);

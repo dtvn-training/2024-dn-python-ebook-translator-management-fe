@@ -1,38 +1,49 @@
 import React from 'react';
 import { ContainerOutlined, LineChartOutlined, SolutionOutlined } from '@ant-design/icons';
 import { Avatar, Layout, Menu } from 'antd';
+import { IoHomeOutline } from 'react-icons/io5';
 import { FaAddressBook, FaRegBell } from 'react-icons/fa6';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Footer } from 'antd/es/layout/layout';
-import { PROGRESS_TRACKING, TASK_MANAGEMENT } from '~/utils/constants';
+import { HOME_PAGE, PROGRESS_TRACKING, REGISTER_TASK } from '~/utils/constants';
+import { useLocale } from 'antd/es/locale';
 const { Header, Content, Sider } = Layout;
 
 const sider = [
     {
         key: 1,
-        label: <Link className="text-base">All Tasks</Link>,
-        icon: <SolutionOutlined style={{ fontSize: '20px' }} />,
+        label: (
+            <Link to={HOME_PAGE} className="text-base">
+                Home
+            </Link>
+        ),
+        icon: <IoHomeOutline style={{ fontSize: '20px' }} />,
     },
     {
         key: 2,
         label: (
-            <Link to={TASK_MANAGEMENT} className="text-base">
-                Task management
+            <Link to={REGISTER_TASK} className="text-base">
+                All Tasks
             </Link>
         ),
-        icon: <ContainerOutlined style={{ fontSize: '20px' }} />,
+        icon: <SolutionOutlined style={{ fontSize: '20px' }} />,
     },
     {
         key: 3,
         label: (
             <Link to={PROGRESS_TRACKING} className="text-base">
-                Translation progress
+                Task management
             </Link>
         ),
-        icon: <LineChartOutlined style={{ fontSize: '20px' }} />,
+        icon: <ContainerOutlined style={{ fontSize: '20px' }} />,
     },
 ];
 const LayoutComponet = ({ children }) => {
+    const { pathname } = useLocation();
+    let defaultLabel = '1';
+    if (pathname === REGISTER_TASK) defaultLabel = '2';
+    if (pathname === PROGRESS_TRACKING) defaultLabel = '3';
+
     return (
         <Layout>
             <Header
@@ -64,7 +75,7 @@ const LayoutComponet = ({ children }) => {
                 >
                     <Menu
                         mode="inline"
-                        defaultSelectedKeys={['1']}
+                        defaultSelectedKeys={[defaultLabel]}
                         style={{
                             height: '100%',
                             borderRight: 0,
