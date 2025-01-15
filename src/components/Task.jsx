@@ -7,7 +7,7 @@ import ReviewTask from './ReviewTask';
 import { useState } from 'react';
 import { isOver } from '~/utils/deadline';
 
-function Task({ tag, title, language, deadline, color }) {
+function Task({ tag, title, language, deadline, color, taskId, done = false }) {
     const [showDrawer, setShowDrawer] = useState(false);
     return (
         <div className="px-4 py-3 rounded-lg shadow-md bg-task space-y-2">
@@ -30,7 +30,7 @@ function Task({ tag, title, language, deadline, color }) {
                 <CiCalendarDate className="text-xl" />
                 <h2>{formatDay(deadline)}</h2>
             </p>
-            <ReviewTask setOpen={setShowDrawer} open={showDrawer} />
+            <ReviewTask done={done} taskId={taskId} setOpen={setShowDrawer} open={showDrawer} />
         </div>
     );
 }
