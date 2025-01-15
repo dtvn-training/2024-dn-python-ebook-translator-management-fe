@@ -1,99 +1,186 @@
-import { Button, Table } from 'antd';
+import { Input, Select, Tabs } from 'antd';
 import { useEffect, useState } from 'react';
-import { MdOutlineOpenInNew } from 'react-icons/md';
-import { Link } from 'react-router-dom';
+import { IoSearchSharp } from 'react-icons/io5';
+import Button from '~/components/Button';
+import ContainTask from '~/components/ContainTask';
+import Task from '~/components/Task';
 import { get } from '~/db';
-import { TRANSCRIPT_TASK } from '~/utils/constants';
-import formatDay from '~/utils/formatDay';
-import { formatMoney } from '~/utils/formatMoney';
 import { optionAuth } from '~/utils/optionFormData';
-import { toastError, toastInfo } from '~/utils/toastConfig';
-import { getMyTask } from '~/utils/urlApi';
+import { TRANSLATE } from '~/utils/taskCategory';
+import { getLanguage, getMyTask, getTaskStatus, taskCategory } from '~/utils/urlApi';
 
 function MyTask() {
-    const [dataSource, setDataSource] = useState([]);
-    const columns = [
-        {
-            title: 'No.',
-            key: 'no',
-            render: (text, record, index) => index + 1,
-            width: '5%',
-        },
-        {
-            title: 'Chapter Name',
-            dataIndex: 'chapterName',
-            key: 'chapterName',
-            width: '25%',
-        },
-        {
-            title: 'Type',
-            dataIndex: 'type',
-            key: 'type',
-            width: '10%',
-        },
-        {
-            title: 'Deadline',
-            dataIndex: 'deadline',
-            key: 'deadline',
-            width: '10%',
-        },
-        {
-            title: 'Salary',
-            dataIndex: 'salary',
-            key: 'salary',
-            width: '10%',
-        },
-        {
-            title: 'Language',
-            dataIndex: 'language',
-            key: 'language',
-            width: '10%',
-        },
-        {
-            title: 'Detail',
-            dataIndex: 'detail',
-            key: 'detail',
-            render: (text, record) => (
-                <Link className="flex justify-center" to={`${TRANSCRIPT_TASK}/${record.key}`}>
-                    <MdOutlineOpenInNew className="text-xl" />
-                </Link>
-            ),
-            width: '5%',
-            align: 'center',
-        },
-    ];
-
+    const [currentTab, setCurrentTab] = useState('');
+    const [languages, setLanguages] = useState([]);
+    const [statuses, setStatuses] = useState([]);
+    const [types, setTypes] = useState([]);
+    const [{ toDo, inProgress, done }, setDataSource] = useState({
+        toDo: [],
+        inProgress: [],
+        done: [],
+    });
+    const [{ language, status, key, type }, setFilter] = useState({
+        language: '',
+        status: '',
+        key: '',
+        type: '',
+    });
     useEffect(() => {
         (async () => {
             try {
-                const res = await get(getMyTask, optionAuth);
-                if (res.status === 200) {
-                    const data = res.data.data;
-                    const source = data.map((data) => ({
-                        key: data.task_id,
-                        chapterName: data.chapter_title,
-                        type: data.type,
-                        language: data.language,
-                        deadline: formatDay(data.deadline),
-                        salary: formatMoney(data.salary),
-                    }));
-                    setDataSource(source);
-                }
+                const resLanguages = get(getLanguage);
+                const resTypes = get(taskCategory);
+                const resStatuses = get(getTaskStatus);
+                getTask(key, language, status, type);
+                const [languageData, typeData, statusData] = await Promise.all([resLanguages, resTypes, resStatuses]);
+                setLanguages(languageData.data);
+                setTypes(typeData.data);
+                setStatuses(statusData.data.data);
             } catch (error) {
-                if (error.status === 401) {
-                    toastInfo('Token expired');
-                }
-                if (error.status === 400) {
-                    toastError(error.response.data.message);
-                }
+                alert('Failed to initialize');
             }
         })();
     }, []);
 
+    useEffect(() => {
+        getTask('', '', currentTab, '');
+    }, [currentTab]);
+
+    const getTask = async (key, language, status, type) => {
+        try {
+            const resTasks = await get(getMyTask(key, language, status, type), optionAuth);
+            const data = resTasks.data.data;
+            setDataSource({
+                toDo: data.to_do,
+                inProgress: data.in_progress,
+                done: data.done,
+            });
+        } catch (error) {
+            alert('Failed to get tasks');
+        }
+    };
+
+    const handleFilter = async () => {
+        getTask(key, language, status, type);
+    };
+
     return (
-        <div>
-            <h1 className="text-xl mb-4">My Task</h1>
-            <Table dataSource={dataSource} columns={columns} />
+        <div className="space-y-6">
+            <div className="flex space-x-6">
+                <Input
+                    placeholder="Enter name"
+                    onChange={(e) => {
+                        setFilter((prev) => ({ ...prev, key: e.target.value }));
+                    }}
+                    value={key}
+                    className="w-[40%]"
+                    prefix={<IoSearchSharp className="text-xl" />}
+                />
+                <Select
+                    className="w-[15%]"
+                    defaultValue={''}
+                    options={[
+                        { label: 'Language', value: '' },
+                        ...languages.map((item) => ({ label: item.title, value: item.language_id })),
+                    ]}
+                    value={language}
+                    onSelect={(value) => {
+                        setFilter((prev) => ({ ...prev, language: value }));
+                    }}
+                />
+                <Select
+                    className="w-[15%]"
+                    defaultValue={''}
+                    options={[
+                        { label: 'Status', value: '' },
+                        ...statuses.map((item) => ({ label: item.status_title, value: item.status_task_id })),
+                    ]}
+                    value={status}
+                    onSelect={(value) => {
+                        setFilter((prev) => ({ ...prev, status: value }));
+                    }}
+                />
+                <Select
+                    className="w-[15%]"
+                    defaultValue={''}
+                    options={[
+                        { label: 'Type', value: '' },
+                        ...types.map((item) => ({ label: item.title, value: item.task_category_id })),
+                    ]}
+                    value={type}
+                    onSelect={(value) => {
+                        setFilter((prev) => ({ ...prev, type: value }));
+                    }}
+                />
+                <Button onClick={handleFilter} className="text-white flex-1" green>
+                    Search
+                </Button>
+            </div>
+            <div className="space-x-6">
+                <button
+                    onClick={() => {
+                        setFilter({ language: '', status: '', key: '', type: '' });
+                        setCurrentTab('');
+                    }}
+                    className={`${currentTab === '' ? 'text-green' : ''} text-[16px] transition-colors`}
+                >
+                    All
+                </button>
+                {statuses.map((item) => (
+                    <button
+                        onClick={() => {
+                            setCurrentTab(item.status_task_id);
+                        }}
+                        className={`${
+                            currentTab === item.status_task_id ? 'text-green' : ''
+                        } text-[16px] transition-colors`}
+                    >
+                        {item.status_title}
+                    </button>
+                ))}
+            </div>
+            <div className="flex space-x-6">
+                <ContainTask style={{ width: '30%' }} title={'To do'} quantity={toDo.length}>
+                    {toDo.map((item) => (
+                        <Task
+                            taskId={item.task_id}
+                            title={item.chapter_title}
+                            deadline={item.deadline}
+                            language={item.language}
+                            tag={item.type}
+                            color={item.type === TRANSLATE ? 'bg-translate' : 'bg-review'}
+                        />
+                    ))}
+                    {toDo.length === 0 && <p className="text-center text-lg">Dont have any task</p>}
+                </ContainTask>
+                <ContainTask style={{ width: '33.33%' }} title={'In progress'} quantity={inProgress.length}>
+                    {inProgress.map((item) => (
+                        <Task
+                            taskId={item.task_id}
+                            title={item.chapter_title}
+                            deadline={item.deadline}
+                            language={item.language}
+                            tag={item.type}
+                            color={item.type === TRANSLATE ? 'bg-translate' : 'bg-review'}
+                        />
+                    ))}
+                    {inProgress.length === 0 && <p className="text-center text-lg">Dont have any task</p>}
+                </ContainTask>
+                <ContainTask style={{ width: '33.33%' }} title={'Done'} quantity={done.length}>
+                    {done.map((item) => (
+                        <Task
+                            taskId={item.task_id}
+                            title={item.chapter_title}
+                            deadline={item.deadline}
+                            language={item.language}
+                            tag={item.type}
+                            color={item.type === TRANSLATE ? 'bg-translate' : 'bg-review'}
+                            done
+                        />
+                    ))}
+                    {done.length === 0 && <p className="text-center text-lg">Dont have any task</p>}
+                </ContainTask>
+            </div>
         </div>
     );
 }
