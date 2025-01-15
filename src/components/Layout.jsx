@@ -5,6 +5,7 @@ import { FaAddressBook, FaRegBell } from 'react-icons/fa6';
 import { Link } from 'react-router-dom';
 import { Footer } from 'antd/es/layout/layout';
 import { pathname } from '~/routes/pathname';
+import CustomFooter from './CustomFooter';
 const { Header, Content, Sider } = Layout;
 
 const sider = [
@@ -176,6 +177,7 @@ const LayoutComponet = ({ children }) => {
                             </div>
                         </div>
                     </Footer>
+                    <CustomFooter />
                 </Layout>
             </Layout>
         </Layout>
