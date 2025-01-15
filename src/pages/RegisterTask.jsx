@@ -1,37 +1,41 @@
 import dayjs from 'dayjs';
 import { useEffect, useReducer, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Card from '~/components/Card';
 import InputBasic from '~/components/InputBasic';
 import { get } from '~/db';
-import { REVIEW_TASK } from '~/utils/constants';
+import { REGISTER_TASK_DETAIL } from '~/utils/constants';
 import formatDay from '~/utils/formatDay';
 import { initState, inputReducer } from '~/utils/inputReducer';
+import { toastError, toastInfo } from '~/utils/toastConfig';
+import { taskRegister } from '~/utils/urlApi';
 import { isCallApi, limit } from '~/utils/paginate';
-import { toastError } from '~/utils/toastConfig';
-import { taskManagementUrl } from '~/utils/urlApi';
+import { formatMoney } from '~/utils/formatMoney';
 
-function TaskManagement() {
+function RegisterTask() {
     const [state, dispatch] = useReducer(inputReducer, initState);
     const [tasks, setTasks] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const containerRef = useRef(null);
     const [hasMore, setHasMore] = useState(true);
-
-    const handleFindTask = async (isNextPage) => {
+    const navigate = useNavigate();
+    const handleFindTask = async (isNextPage = false) => {
         try {
-            const deadline = formatDay(state.date);
-            const res = await get(taskManagementUrl(state.title, deadline, state.type, currentPage, limit));
-
-            if (res.status === 200 && res.statusText == 'OK' && res.data?.data) {
-                if (res.data.data.length < limit) {
+            const res = await get(taskRegister(state.title, state.type, state.language, currentPage, limit));
+            if (res.status === 200 && res.statusText == 'OK' && res.data) {
+                if (res.data.length < limit) {
                     setHasMore(false);
                 }
-                if (isNextPage) setTasks([...tasks, ...res.data.data]);
-                else setTasks(res.data.data);
+                if (isNextPage) setTasks((pre) => [...pre, ...res.data]);
+                else setTasks(res.data);
             }
         } catch (error) {
             toastError('Failed to find task');
         }
+    };
+
+    const handleRegistration = async (task) => {
+        navigate(`${REGISTER_TASK_DETAIL}/${task.task_id}`, { state: task });
     };
 
     useEffect(() => {
@@ -46,6 +50,7 @@ function TaskManagement() {
         return () => container.removeEventListener('scroll', handleScroll);
     }, [hasMore]);
 
+    // load tasks
     useEffect(() => {
         handleFindTask(true);
     }, [currentPage]);
@@ -53,22 +58,23 @@ function TaskManagement() {
     return (
         <div className="space-y-6">
             <div className="w-[80%] border border-black m-auto px-4 py-6 rounded-xl space-y-3">
-                <InputBasic handleFind={handleFindTask} state={state} dispatch={dispatch} />
+                <InputBasic isLanguage handleFind={handleFindTask} state={state} dispatch={dispatch} />
             </div>
             <div
                 ref={containerRef}
-                className="grid grid-cols-2 gap-3 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-3 max-h-[75vh] overflow-y-auto"
+                className="grid grid-cols-2 gap-3 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-3 max-h-[75vh] overflow-y-scroll"
             >
                 {tasks.map((item, index) => (
                     <div className="space-y-1" key={index}>
                         <Card
+                            hasWarning={false}
                             title={item.chapter_title}
-                            author={item.author}
                             deadline={formatDay(item.deadline)}
                             language={item.language}
                             type={item.type}
-                            to={`${REVIEW_TASK}/${item.task_id}`}
-                            button={'Review'}
+                            salary={item.salary}
+                            onClick={() => handleRegistration(item)}
+                            button={'Registration'}
                         />
                     </div>
                 ))}
@@ -77,4 +83,4 @@ function TaskManagement() {
     );
 }
 
-export default TaskManagement;
+export default RegisterTask;
