@@ -142,7 +142,6 @@ function ReviewTask({ setOpen, open, taskId, done }) {
                             setTranslationFile([]);
                         }}
                         beforeUpload={(e) => {
-                            console.log(e);
                             setTranslationFile([e]);
                             return false;
                         }}
