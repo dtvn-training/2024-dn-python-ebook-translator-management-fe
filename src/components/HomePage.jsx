@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowRightOutlined } from '@ant-design/icons';
+import { Footer } from './Layout';
 
 const HomePage = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -21,7 +22,7 @@ const HomePage = () => {
             {/* Header */}
             <header className="bg-teal-400 text-white p-4 shadow-md">
                 <div className="container mx-auto flex justify-between items-center">
-                    <h1 className="text-2xl font-bold text-left">AT System</h1>
+                    <h1 className="text-2xl font-bold text-left">AT Translator System</h1>
 
                     <nav className="flex items-center space-x-4">
                         <div className="flex-1 flex justify-center">
@@ -108,9 +109,7 @@ const HomePage = () => {
             </main>
 
             {/* Footer */}
-            <footer className="bg-gray-800 text-white text-center p-4 mt-6">
-                <p>&copy; 2025 Translator System. All rights reserved.</p>
-            </footer>
+            <Footer></Footer>
         </div>
     );
 };
