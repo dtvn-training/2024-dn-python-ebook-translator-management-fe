@@ -34,7 +34,7 @@ const sider = [
     },
 ];
 const LayoutComponet = ({ children }) => {
-    const [showProfile, setShowProfile] = useState(false);
+    const [showProfile, setShowProfile] = useState(true);
     return (
         <Layout>
             {showProfile && <EditProfile setShowProfile={setShowProfile} />}

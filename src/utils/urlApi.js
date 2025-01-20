@@ -4,3 +4,6 @@ export const uploadChapterUrl = '/chapter/upload';
 export const progressTrackingDetail = '/ebook/progress-tracking-detail';
 export const DOWNLOAD_FILE = 'http://localhost:5000/api/files';
 export const progressTracking = '/ebook/progress-tracking';
+export const getProfile = '/user/get-profile';
+export const editProfile = '/user/edit-profile';
+export const showImage = 'http://localhost:5000/api/files/show';

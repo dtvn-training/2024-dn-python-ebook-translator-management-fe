@@ -1,15 +1,23 @@
 import { Avatar, Button, Input } from 'antd';
-import { useId, useMemo, useRef, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { CiEdit } from 'react-icons/ci';
+import { get, post } from '~/db';
 import { isPhoneNumber } from '~/utils/checkPhoneNumber';
+import formatDay from '~/utils/formatDay';
 import { isEmail } from '~/utils/isEmail';
+import { optionFormAndAuth } from '~/utils/optionFormData';
+import { editProfile, getProfile, showImage } from '~/utils/urlApi';
 import { editProfileValidation } from '~/validations/editProfile';
 function EditProfile({ setShowProfile }) {
-    const [{ avatar, email, name, phone }, setProfile] = useState({
-        name: null,
-        email: null,
+    const [{ avatar, email, name, phone, level, totalTask, username, createdAt }, setProfile] = useState({
+        name: '',
+        email: '',
         phone: null,
-        avatar: null,
+        avatar: '',
+        level: '',
+        totalTask: 0,
+        username: '',
+        createdAt: new Date(),
     });
     const inputFileId = useId();
     const containerRef = useRef(null);
@@ -21,7 +29,7 @@ function EditProfile({ setShowProfile }) {
     };
 
     const handleRemoveAvatar = () => {
-        setProfile((prev) => ({ ...prev, avatar: null }));
+        setProfile((prev) => ({ ...prev, avatar: '' }));
     };
 
     const isUpdate = useMemo(() => {
@@ -48,18 +56,49 @@ function EditProfile({ setShowProfile }) {
 
     const handleSubmit = async (e) => {
         try {
-            const value = await editProfileValidation.validate({
+            await editProfileValidation.validate({
                 email: email,
                 phone: phone,
             });
-            // todo: call api to edit profile
+            const formData = new FormData();
+            formData.append('email', email);
+            formData.append('phone_number', phone ? phone : '');
+            formData.append('avatar', avatar);
+            formData.append('fullname', name);
+            const res = await post(editProfile, formData, optionFormAndAuth);
+            if (res.status === 200) {
+                alert('Updated profile');
+            }
         } catch (error) {
             if (error.name === 'ValidationError') {
                 alert(error.message);
                 return;
+            } else {
+                alert('Fail to update profile');
             }
         }
     };
+
+    useEffect(() => {
+        (async () => {
+            try {
+                const res = await get(getProfile, optionFormAndAuth);
+                const data = res.data.data;
+                setProfile({
+                    avatar: `${showImage}/${data.avatar}`,
+                    email: data.email,
+                    name: data.full_name,
+                    phone: data.phone_number,
+                    level: data.level[0]?.toUpperCase() + data.level.slice(1),
+                    totalTask: data.total_task,
+                    username: data.username,
+                    createdAt: data.created_at,
+                });
+            } catch (error) {
+                alert('Fail to get profile');
+            }
+        })();
+    }, []);
 
     return (
         <div
@@ -78,8 +117,17 @@ function EditProfile({ setShowProfile }) {
                     <div>
                         <h4 className="text-base opacity-80">Profile picture</h4>
                         <div className="space-x-8 mt-2 flex items-center">
-                            <Avatar size={70} src={avatar ? URL.createObjectURL(avatar) : null} />
-                            <input onChange={handleChangeAvatar} id={inputFileId} type="file" className="hidden" />
+                            <Avatar
+                                size={70}
+                                src={typeof avatar === 'string' ? avatar : avatar ? URL.createObjectURL(avatar) : ''}
+                            />
+                            <input
+                                onChange={handleChangeAvatar}
+                                id={inputFileId}
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                            />
                             <div className="space-x-4 flex ">
                                 <label
                                     className="block bg-blue-500 rounded-md px-2 cursor-pointer text-center h-[32px] leading-[32px] text-white text-sm"
@@ -107,8 +155,8 @@ function EditProfile({ setShowProfile }) {
                     </div>
                     <div>
                         <label>Username</label>
-                        <Input size="large" addonBefore={'@'} value="Nguyenthanhan" disabled />
-                        <p className="text-sm opacity-60 italic mt-1">Created in 12/12/2024</p>
+                        <Input size="large" addonBefore={'@'} value={username} disabled />
+                        <p className="text-sm opacity-60 italic mt-1">Created in {formatDay(createdAt)}</p>
                     </div>
                     <div>
                         <label>Email</label>
@@ -132,11 +180,11 @@ function EditProfile({ setShowProfile }) {
                         </div>
                         <div className="w-1/5">
                             <label>Level</label>
-                            <Input className="h-[40px]" placeholder="Begin" disabled />
+                            <Input className="h-[40px]" placeholder={level} disabled />
                         </div>
                         <div className="w-1/4">
                             <label>Total task</label>
-                            <Input className="h-[40px] text-center" placeholder="3" disabled />
+                            <Input className="h-[40px] text-center" placeholder={totalTask} disabled />
                         </div>
                     </div>
                 </div>
