@@ -13,10 +13,13 @@ export const axiosInterceptor = (navigate) => {
                 try {
                     originalRequest._retry = true;
                     const res = await post(refreshToken, null, optionRefreshToken);
-                    const { data: accessToken } = res.data;
-                    localStorage.setItem('accessToken', accessToken);
-                    config.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-                    originalRequest.headers['Authorization'] = `Bearer ${accessToken}`;
+                    const {
+                        data: { access_token, refresh_token },
+                    } = res.data;
+                    localStorage.setItem('accessToken', access_token);
+                    localStorage.setItem('refreshToken', refresh_token);
+                    config.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+                    originalRequest.headers['Authorization'] = `Bearer ${access_token}`;
                     return config(originalRequest);
                 } catch (error) {
                     localStorage.removeItem('accessToken');
